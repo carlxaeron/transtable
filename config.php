@@ -1,4 +1,4 @@
 <?php
 
 // translation files
-$TTCFG['translations_file'] = 'translations.php';
+$TTCFG['lang_files'][] = array('path' => '', 'description' => '');
