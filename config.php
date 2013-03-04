@@ -1,6 +1,10 @@
 <?php
 
-// translation files
-$TTCFG['lang_files_dir'] = '';
+// folder with translation files
+$TTCFG['php_array_files']['root_dir'] = 'W:/WEBROOT/transtable/translations';
 
+// translation file name pattern
+$TTCFG['php_array_files']['file_name_pattern'] = '..\.php';
 
+// the name of the array that holds translations
+$TTCFG['php_array_files']['var_name'] = 't';
