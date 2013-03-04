@@ -26,38 +26,34 @@ class transtable{
 	 */
 	public function get_all_translations(){
 		
-		
-		
-		$patern = '/^' . $this->config['file_name_pattern'] . '$/';
-		
-		$cur_dir = '';
+		// file name pattern
+		$file_name_pattern = '/^' . $this->config['file_name_pattern'] . '$/';
 		
 		$di = new RecursiveDirectoryIterator($this->config['root_dir']);
 		foreach (new RecursiveIteratorIterator($di) as $path => $file) {
 			
-			if($file->isDir())
-				echo $path . '----<br>';
+			// file name
+			$file_name = $file->getFilename();
 			
 			// skip directories and file with names that doesn't match the patern
-			if($file->isDir() or !preg_match($patern, $file->getFilename()))
+			if($file->isDir() or !preg_match($file_name_pattern, $file_name))
 				continue;
+				
+			// folder name
+			$folder_name = basename(dirname($path));
+			
+			// reset variable with translations
+			${$this->config['var_name']} = array();
 			
 			// include the file
+			include $path;
 			
-			// read content
+			$return[$folder_name][$file_name] = ${$this->config['var_name']};
 			
-			// file name
-			
-			// folder name
-			
-			// 
-			
-			$return[$folder][$filename] = $$this->config['var_name'];
-			
-			print_r($path);
 			
 		}
 		
+		return $return;
 	}
 	
 	
