@@ -6,13 +6,25 @@ include 'Psa_Dully.class.php';
 $translate = new transtable($TTCFG['php_array_files']);
 
 
-//print_r($translate->get_all_translations());
+$translations = $translate->get_all_translations();
 
 
-$translate->save_translation('/hr.php', 'wwwwww', 'asdfasdfasdfasdf');
+//$translate->save_translation('/hr.php', 'wwwwww', 'asdfasdfasdfasdf');
 
 
 // display template
+$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
+$dully->assign('data', $translations);
+$dully->fetch('lang_file.tpl');
+
+
+
+
+
+
+
+
+
 
 class transtable{
 	
