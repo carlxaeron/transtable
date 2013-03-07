@@ -8,14 +8,17 @@ $translate = new transtable($TTCFG['php_array_files']);
 
 $translations = $translate->get_all_translations();
 
-
+print_r($translations);
 //$translate->save_translation('/hr.php', 'wwwwww', 'asdfasdfasdfasdf');
 
 
 // display template
 $dully = new Psa_Dully(dirname(__FILE__) . '/templates');
+
 $dully->assign('data', $translations);
-$dully->fetch('lang_file.tpl');
+$dully->assign('data', $TTCFG['php_array_files']['var_name']);
+
+echo $dully->fetch('translation_table.tpl');
 
 
 
@@ -40,7 +43,7 @@ class transtable{
 	/**
 	 * 
 	 */
-	public function get_all_translations(){
+	public function get_all_translations($for_folder = null){
 		
 		// file name pattern
 		$file_name_pattern = '/^' . $this->config['file_name_pattern'] . '$/';
@@ -64,16 +67,51 @@ class transtable{
 			// folder relative path
 			$folder = '/' . substr_replace(dirname($path), '', 0, $root_path_len);
 			
-			// reset variable with translations
-			${$this->config['var_name']} = array();
+			// include the file with translations
+			if(!$for_folder or $for_folder == $folder){
+				
+				// reset variable with translations
+				${$this->config['var_name']} = array();
+				
+				// include the file
+				include $path;
+				
+				$return[$folder]['translations'][$file_name] = ${$this->config['var_name']};
+			}
+			else
+				$return[$folder]['translations'] = null;
 			
-			// include the file
-			include $path;
-			
-			$return[$folder][$file_name] = ${$this->config['var_name']};
+			$return[$folder]['tab_name'] = basename($folder);
 		}
 		
+		// find all indexes form each translation array
+		foreach ($folder as $folder => $data) {
+			
+			if($folder[$folder]['translations']){
+				foreach ($folder[$folder]['translations'] as $file_name => $translations) {
+					
+				}
+			}
+		}
+		print_r($return);
+		
 		return $return;
+	}
+	
+	
+	function echo_translation_array($translations, $var_name, $arr_level = ''){
+	
+		foreach ($translations as $index => $translation){
+	
+			$arr_level1 = $arr_level . "['" . $index . "']";
+	
+			if(is_array($translation)){
+				echo_translation_array($translation, $var_name, $arr_level1);
+			}
+			else
+				echo '$' . $var_name . $arr_level1 . " = '" . addslashes($translation) . "';\n";
+		}
+	
 	}
 	
 	
