@@ -11,3 +11,9 @@ $TTCFG['php_array_files']['var_name'] = 't';
 
 // delimiter for translations from multi dimensional arrays
 $TTCFG['php_array_files']['array_delimiter'] = '|';
+
+// Page title
+$TTCFG['php_array_files']['page_title'] = 'Transtable';
+
+// Enable html editor
+$TTCFG['php_array_files']['enable_html_editor'] = true;
