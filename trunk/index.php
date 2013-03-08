@@ -9,17 +9,20 @@ $translate = new transtable($TTCFG['php_array_files']);
 
 $translations = $translate->get_all_translations();
 
-print_r($translations);
+//print_r($translations);
 //$translate->save_translation('/hr.php', 'wwwwww', 'asdfasdfasdfasdf');
 
 
 // display template
 $dully = new Psa_Dully(dirname(__FILE__) . '/templates');
 
+$dully->assign('translate', $translate);
 $dully->assign('data', $translations);
-$dully->assign('data', $TTCFG['php_array_files']['var_name']);
+$dully->assign('folder', '/');
+$dully->assign('page_title', $TTCFG['php_array_files']['page_title']);
+$dully->assign('page_content', $dully->fetch('translation_table.tpl'));
 
-echo $dully->fetch('translation_table.tpl');
+echo $dully->fetch('main.tpl');
 
 
 
@@ -126,7 +129,7 @@ class transtable{
 	
 	/**
 	 * Recursive function which return text index from multi dimensional array.
-	 * For example for array with elements ['bla']['bla']['bla'] will return bla|bla|bla
+	 * For example, for array with elements ['bla']['bla']['bla'] will return bla|bla|bla
 	 * 
 	 * @param array $translation_array 
 	 * @param string $prefix_index
@@ -146,6 +149,26 @@ class transtable{
 		}
 		
 		return $return;
+	}
+	
+	
+	/**
+	 * Returns php arrray index from txt index.
+	 * For example:
+	 * for bla will return ['bla']
+	 * for bla|bla|bla will return ['bla']['bla']['bla']
+	 * 
+	 * @param string $txt_index
+	 */
+	public function get_php_index($txt_index){
+		
+		$txt_index = addslashes($txt_index);
+		
+		// for multi dimensional indexes like bla|bla|bla
+		if(strpos($txt_index, $this->config['array_delimiter']) !== false)
+			return "['" . str_replace($this->config['array_delimiter'], "']['", $txt_index) . "']";
+		else
+			return "['" . $txt_index . "']";
 	}
 	
 	
@@ -177,12 +200,7 @@ class transtable{
 		include $file_path;
 	
 		// set new value
-		if(strpos($index, $this->config['array_delimiter']) !== false){ // for multi dimensional indexes like bla|bla|bla
-			$eval_str = "['" . str_replace($this->config['array_delimiter'], "']['") . "']";
-			eval('${$this->config[\'var_name\']}' . $eval_str . ' = $translation');
-		}
-		else
-			${$this->config['var_name']}[$index] = $translation;
+		eval('${$this->config[\'var_name\']}' . $this->get_php_index($index) . ' = $translation');
 		
 		// save new file
 		$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
