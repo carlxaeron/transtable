@@ -1,3 +1,4 @@
+<pre>
 <?php
 
 include 'config.php';
@@ -31,17 +32,25 @@ echo $dully->fetch('translation_table.tpl');
 
 class transtable{
 	
+	
+	/**
+	 * Configuration array
+	 */
 	public $config;
 	
+	
+	/**
+	 * Constructor
+	 */
 	public function __construct($config){
 		
+		// put config array to class scope
 		$this->config = $config;
-		
 	}
 	
 	
 	/**
-	 * 
+	 * Return array with all folders (tabs) and corresponding translations
 	 */
 	public function get_all_translations($for_folder = null){
 		
@@ -84,39 +93,68 @@ class transtable{
 			$return[$folder]['tab_name'] = basename($folder);
 		}
 		
+		
+		// array that holds all indexes from all translation arrays (from each file in folder)
+		$return[$folder]['all_indexes'] = array();
+		
+		
 		// find all indexes form each translation array
-		foreach ($folder as $folder => $data) {
-			
-			if($folder[$folder]['translations']){
-				foreach ($folder[$folder]['translations'] as $file_name => $translations) {
-					
+		// for each folder
+		foreach ($return as $folder => $data) {
+			// if there are any translations
+			if($return[$folder]['translations']){
+				// for each file
+				foreach ($return[$folder]['translations'] as $file_name => $translations) {
+					// for each translation in file
+					foreach ($translations as $index => $translation) {
+						
+						if(is_array($translation)){
+							foreach ($this->get_text_index($translation, $index) as $subindexes_text)
+								$return[$folder]['all_indexes'][$subindexes_text] = null;
+						}
+						else{
+							$return[$folder]['all_indexes'][$index] = null;
+						}
+					}
 				}
 			}
 		}
-		print_r($return);
 		
 		return $return;
 	}
 	
 	
-	function echo_translation_array($translations, $var_name, $arr_level = ''){
+	/**
+	 * Recursive function which return text index from multi dimensional array.
+	 * For example for array with elements ['bla']['bla']['bla'] will return bla|bla|bla
+	 * 
+	 * @param array $translation_array 
+	 * @param string $prefix_index
+	 */
+	protected function get_text_index($translation_array, $prefix_index){
+		
+		static $return = array();
+		
+		foreach ($translation_array as $index => $value){
 	
-		foreach ($translations as $index => $translation){
-	
-			$arr_level1 = $arr_level . "['" . $index . "']";
-	
-			if(is_array($translation)){
-				echo_translation_array($translation, $var_name, $arr_level1);
-			}
+			$text_index = $prefix_index . '|' . $index;
+			
+			if(is_array($value))
+				$this->get_text_index($value, $text_index);
 			else
-				echo '$' . $var_name . $arr_level1 . " = '" . addslashes($translation) . "';\n";
+				$return[] = $text_index;
 		}
-	
+		
+		return $return;
 	}
 	
 	
 	/**
-	 *
+	 * Saves translation to file
+	 * 
+	 * @param string $file_path_relative relative path from $TTCFG['php_array_files']['root_dir']
+	 * @param string $index text index
+	 * @param string $translation translation value
 	 */
 	public function save_translation($file_path_relative, $index, $translation){
 	
@@ -139,7 +177,12 @@ class transtable{
 		include $file_path;
 	
 		// set new value
-		${$this->config['var_name']}[$index] = $translation;
+		if(strpos($index, $this->config['array_delimiter']) !== false){ // for multi dimensional indexes like bla|bla|bla
+			$eval_str = "['" . str_replace($this->config['array_delimiter'], "']['") . "']";
+			eval('${$this->config[\'var_name\']}' . $eval_str . ' = $translation');
+		}
+		else
+			${$this->config['var_name']}[$index] = $translation;
 		
 		// save new file
 		$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
