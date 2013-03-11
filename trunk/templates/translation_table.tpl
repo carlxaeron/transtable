@@ -27,11 +27,14 @@
 			<?php echo $_file_name; ?>
 		</td>
 		<?php
-		$_column_index++;
+			$_column_index++;
 		} 
 		?>
 	</tr>
-	<?php } ?>
+	<?php 
+		$_row_index++;
+	} 
+	?>
 	
 	<!-- rows with translations -->
 	<tr>
@@ -47,12 +50,12 @@
 			<?php eval('echo htmlspecialchars($_translations' . $translate->get_php_index($_index) . ');'); ?>
 		</td>
 		<?php 
-		$_column_index++;
+			$_column_index++;
 		} 
 		?>
 	</tr>
 	<?php 
-	$_row_index++;
+		$_row_index++;
 	} 
 	?>
 </table>

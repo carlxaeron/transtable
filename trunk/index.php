@@ -5,6 +5,9 @@ include 'config.php';
 include 'Psa_Dully.class.php';
 
 
+/**
+ * Router. Finds action to do from GET parameter.
+ */
 if(isset($_GET['transtable_action']) && $_GET['transtable_action'])
 	$action = $_GET['transtable_action'];
 else
@@ -12,9 +15,8 @@ else
 
 
 /**
- * Ccontroller part
+ * Controller
  */
-
 
 // main page
 if($action == 'index'){
@@ -50,9 +52,9 @@ else if($action == 'savetranslation'){
 
 
 
-
-
-
+/**
+ * Model
+ */
 class transtable{
 	
 	
@@ -187,6 +189,11 @@ class transtable{
 	 */
 	public function get_php_index($txt_index){
 		
+		$txt_index = trim($txt_index);
+		
+		if(!$txt_index)
+			throw new transtable_exception("Translation index cannot be empty");
+		
 		$txt_index = addslashes($txt_index);
 		
 		// for multi dimensional indexes like bla|bla|bla
@@ -239,5 +246,8 @@ class transtable{
 }
 
 
+/**
+ * Exception transtable_exception
+ */
 class transtable_exception extends Exception{}
 
