@@ -4,25 +4,45 @@
 include 'config.php';
 include 'Psa_Dully.class.php';
 
-$translate = new transtable($TTCFG['php_array_files']);
+
+if(isset($_GET['transtable_action']) && $_GET['transtable_action'])
+	$action = $_GET['transtable_action'];
+else
+	$action = 'index';
 
 
-$translations = $translate->get_all_translations();
+/**
+ * Ccontroller part
+ */
 
-//print_r($translations);
-//$translate->save_translation('/hr.php', 'wwwwww', 'asdfasdfasdfasdf');
 
+// main page
+if($action == 'index'){
+	
+	$transtable = new transtable();
+	
+	// get all translations from the root folder
+	$translations = $transtable->get_all_translations('/');
+	
+	// display template
+	$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
+	
+	$dully->assign('translate', $transtable);
+	$dully->assign('data', $translations);
+	$dully->assign('folder', '/');
+	$dully->assign('page_title', $TTCFG['php_array_files']['page_title']);
+	$dully->assign('page_content', $dully->fetch('translation_table.tpl'));
+	
+	echo $dully->fetch('main.tpl');
+}
 
-// display template
-$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
-
-$dully->assign('translate', $translate);
-$dully->assign('data', $translations);
-$dully->assign('folder', '/');
-$dully->assign('page_title', $TTCFG['php_array_files']['page_title']);
-$dully->assign('page_content', $dully->fetch('translation_table.tpl'));
-
-echo $dully->fetch('main.tpl');
+// save translation
+else if($action == 'savetranslation'){
+	
+	$transtable = new transtable();
+	
+	echo $transtable->save_translation($_POST['file_name'], $_POST['index'], $_POST['translation']);
+}
 
 
 
@@ -45,10 +65,15 @@ class transtable{
 	/**
 	 * Constructor
 	 */
-	public function __construct($config){
+	public function __construct($config = null){
 		
 		// put config array to class scope
-		$this->config = $config;
+		if($config)
+			$this->config = $config;
+		else{
+			global $TTCFG;
+			$this->config = $TTCFG['php_array_files'];
+		}
 	}
 	
 	
@@ -178,12 +203,12 @@ class transtable{
 	 * @param string $file_path_relative relative path from $TTCFG['php_array_files']['root_dir']
 	 * @param string $index text index
 	 * @param string $translation translation value
+	 * @throws transtable_exception
 	 */
 	public function save_translation($file_path_relative, $index, $translation){
 	
 		// full path to file
-		$file_path = $this->config['root_dir'] . $file_path_relative;
-		$file_path_clean = realpath($this->config['root_dir'] . $file_path_relative);
+		$file_path_clean = realpath($this->config['root_dir'] . '/' . $file_path_relative);
 		
 		if(!$file_path_clean)
 			throw new transtable_exception("File $file_path doesn't exists");
@@ -197,16 +222,19 @@ class transtable{
 		${$this->config['var_name']} = array();
 		
 		// include the file
-		include $file_path;
+		include $file_path_clean;
 	
 		// set new value
-		eval('${$this->config[\'var_name\']}' . $this->get_php_index($index) . ' = $translation');
+		eval('${$this->config[\'var_name\']}' . $this->get_php_index($index) . ' = $translation;');
 		
 		// save new file
 		$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
 		$dully->assign('t', ${$this->config['var_name']});
 		$dully->assign('var_name', $this->config['var_name']);
-		file_put_contents($file_path_clean, $dully->fetch('lang_file.tpl'));
+		if(!file_put_contents($file_path_clean, $dully->fetch('lang_file.tpl')))
+			throw new transtable_exception("Cannot write to file $file_path_clean");
+		
+		return 1;
 	}
 }
 

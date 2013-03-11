@@ -5,6 +5,9 @@
 transtable = {}
 
 
+/**
+ * Temporary storage for original content while editing
+ */
 transtable.cancel_content = {};
 
 
@@ -26,7 +29,9 @@ transtable.CKeditor_config = {
 			['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 			['Link','Unlink'],
 		],
-	height : '100px'
+	height : '100px',
+	enterMode : CKEDITOR.ENTER_BR,
+	shiftEnterMode: CKEDITOR.ENTER_P
 };
 
 
@@ -51,7 +56,6 @@ transtable.edit_translation = function(translation_id){
 	var textarea = $('<textarea id="transtable_edit_' + translation_id + '" >' + cell.html() + '</textarea>');
 	var save_button = $('<button type="button">Save</button>');
 	var cancel_button = $('<button type="button">Cancel</button>');
-	var cancel_content = $('<button type="button">Cancel</button>');
 	
 	save_button.on('click', function(e){		
 		transtable.save_translation($(e.target).parent('td').attr('data-transtable-translaion-id'));
@@ -73,7 +77,14 @@ transtable.edit_translation = function(translation_id){
 /**
  * Cancels editing
  */
-transtable.cancel_edit_translation = function(translation_id){
+transtable.cancel_edit_translation = function(translation_id, translation){
+	
+	if(translation)
+		transtable.cancel_content[translation_id] = translation;
+	
+	if(CKEDITOR.instances['transtable_edit_' + translation_id])
+		CKEDITOR.instances['transtable_edit_' + translation_id].destroy();
+	
 	$('#transtable_cell_' + translation_id).html(transtable.cancel_content[translation_id]);
 	delete transtable.cancel_content[translation_id];
 	
@@ -85,22 +96,29 @@ transtable.cancel_edit_translation = function(translation_id){
  */
 transtable.save_translation = function(translation_id){
 	
-	console.log(translation_id);
+	var cell = $('#transtable_cell_' + translation_id);
+	
+	var column = cell[0].cellIndex;
+	var row = cell[0].parentNode.rowIndex;
+		
+	var file_name = $.trim($('#transtable_file_name' + column).html());
+	var index = $.trim($('#transtable_trans_index' + row).html());
 	
 	
-	var id= language + '-' + variable;
-	var x = CKEDITOR.instances[id].getData();
-	var data = 't[' + language + ']['+ variable + '] = ' + x;
+	// if ck editor is enabled
+	if(CKEDITOR.instances['transtable_edit_' + translation_id]){
+		var ck_instance = CKEDITOR.instances['transtable_edit_' + translation_id];
+		var translation = ck_instance.getData();
+	}
+	else
+		translation = $('transtable_edit_' + translation_id).val();
 	
 	$.ajax({
 		type: 'POST',
-		url: 'savetranslation',
-		data: data,
+		url: '?transtable_action=savetranslation',
+		data: {file_name:file_name, index:index, translation:translation},
 		success: function(e){
-			var htmlStr = '<div id="' + id + '" onclick="edit(\''+language+'\',\''+variable+'\')">' + x + '</div>';
-				$("#"+ id).replaceWith(htmlStr);
-				$("#"+ id+1).remove();
-				CKEDITOR.instances[id].destroy();
+			transtable.cancel_edit_translation(translation_id, translation);
 		}
 	});
 }
