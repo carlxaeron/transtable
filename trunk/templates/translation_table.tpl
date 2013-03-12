@@ -44,7 +44,7 @@
 		<?php 
 		$_column_index = 1;
 		foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
-		$_id = 't' . md5($folder . $_file_name . $_index);
+			$_id = 't' . md5($folder . $_file_name . $_index);
 		?>
 		<td class="transtable_translation_cell" data-transtable-translaion-id="<?php echo $_id ?>" id="transtable_cell_<?php echo $_id ?>">
 			<?php eval('echo htmlspecialchars($_translations' . $translate->get_php_index($_index) . ');'); ?>
