@@ -12,8 +12,14 @@ $TTCFG['php_array_files']['var_name'] = 't';
 // delimiter for translations from multi dimensional arrays
 $TTCFG['php_array_files']['array_delimiter'] = '|';
 
-// Page title
+// page title
 $TTCFG['php_array_files']['page_title'] = 'Transtable';
 
-// Enable html editor
+// enable html editor
 $TTCFG['php_array_files']['enable_html_editor'] = true;
+
+// enable editing indexes (first column)
+$TTCFG['php_array_files']['enable_edit_indexes'] = true;
+
+// translation file newlines
+$TTCFG['php_array_files']['new_lines'] = PHP_EOL; // "\n" "\r\n"

@@ -94,7 +94,7 @@ transtable.edit_index = function(td_id){
 	var cancel_button = $('<button type="button">Cancel</button>');
 	
 	save_button.on('click', function(e){		
-		transtable.save_index($(e.target).parent('td').attr('id'));
+		transtable.rename_index($(e.target).parent('td').attr('id'));
 	});
 	
 	cancel_button.on('click', function(e){		
@@ -172,9 +172,9 @@ transtable.save_translation = function(translation_id){
 
 
 /**
- * Saves index
+ * Renames index
  */
-transtable.save_index = function(td_id){
+transtable.rename_index = function(td_id){
 	
 	var cell = $('#' + td_id);
 	

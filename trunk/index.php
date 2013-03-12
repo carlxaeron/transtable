@@ -26,7 +26,7 @@ if($action == 'index'){
 	// get all translations from the root folder
 	$translations = $transtable->get_all_translations('/');
 	
-	print_r($translations);
+	//print_r($translations);
 	
 	// display template
 	$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
@@ -53,7 +53,7 @@ else if($action == 'saveindex'){
 
 	$transtable = new transtable();
 
-	echo $transtable->add_rename_index($_POST['old_index'], $_POST['new_index'], $_POST['folder']);
+	echo $transtable->rename_index($_POST['old_index'], $_POST['new_index'], $_POST['folder']);
 }
 
 
@@ -152,7 +152,8 @@ class transtable{
 					foreach ($translations as $index => $translation) {
 						
 						if(is_array($translation)){
-							foreach ($this->get_text_index($translation, $index) as $subindexes_text)
+							
+							foreach ($this->get_text_indexes($translation, $index) as $subindexes_text)
 								$return[$folder]['all_indexes'][$subindexes_text] = null;
 						}
 						else{
@@ -174,7 +175,7 @@ class transtable{
 	 * @param array $translation_array 
 	 * @param string $prefix_index
 	 */
-	protected function get_text_index($translation_array, $prefix_index){
+	protected function get_text_indexes($translation_array, $prefix_index){
 		
 		static $return = array();
 		
@@ -183,7 +184,7 @@ class transtable{
 			$text_index = $prefix_index . '|' . $index;
 			
 			if(is_array($value))
-				$this->get_text_index($value, $text_index);
+				$this->get_text_indexes($value, $text_index);
 			else
 				$return[] = $text_index;
 		}
@@ -239,7 +240,7 @@ class transtable{
 		eval('${$this->config[\'var_name\']}' . $this->get_php_index($index) . ' = $translation;');
 		
 		// save file
-		$this->save_translation_file($file_path_clean, $translations);
+		$this->write_translation_file($file_path_clean, $translations);
 		
 		return 1;
 	}
@@ -252,12 +253,21 @@ class transtable{
 	 * @param string $translations
 	 * @throws transtable_exception
 	 */
-	protected function save_translation_file($file, $translations){
-	
+	protected function write_translation_file($file, $translations){
+		
 		$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
 		$dully->assign('t', $translations);
 		$dully->assign('var_name', $this->config['var_name']);
-		if(!file_put_contents($file, $dully->fetch('lang_file.tpl')))
+		
+		// php file content
+		$file_content = $dully->fetch('lang_file.tpl');
+		
+		// normalize new lines
+		str_replace(array("\r\n","\r"), "\n", $file_content);
+		if($this->config['new_lines'] != "\n")
+			$file_content = str_replace("\n", $this->config['new_lines'], $file_content);
+		
+		if(!file_put_contents($file, $file_content))
 			throw new transtable_exception("Cannot write to file $file");
 	}
 	
@@ -292,17 +302,23 @@ class transtable{
 
 
 	/**
+	 * Renames the index in the translation array
 	 * 
 	 * @param unknown_type $old_index
 	 * @param unknown_type $new_index
 	 * @param unknown_type $folder
 	 */
-	public function add_rename_index($old_index, $new_index, $folder){
+	public function rename_index($old_text_index, $new_text_index, $folder){
 	
+		$this->require_edit_index_permission();
+		
 		$folder = $this->check_path($folder);
 		
-		//if(!$old_index or !$new_index)
-		//	throw new transtable_exception("Error. Old or new index name not set.");
+		$old_text_index = trim($old_text_index);
+		$new_text_index = trim($new_text_index);
+		
+		if(!$old_text_index or !$new_text_index)
+			throw new transtable_exception("Error. Old or new index name not set.");
 		
 		$translations = $this->get_all_translations($folder);
 		
@@ -311,42 +327,154 @@ class transtable{
 			
 			if($folder == $folder){
 				foreach ($data['translations'] as $file_name => $translations) {
+						
+					// full path to file with translations
+					$file_path = $this->check_path($folder . $file_name, 'return_absolute_path');
 					
-					//$file_path = 
+					// replace index
+					$translations = $this->replace_array_key($translations, $old_text_index, $new_text_index);
 					
-					// rename
-					if(isset($translations[$old_index])){
-						$this->save_translation_file($folder . $file_name, $this->replace_array_key($translations, $old_text_index, $new_text_index));
-					}
+					// write file
+					$this->write_translation_file($file_path, $translations);
 				}
 			}
 		}
 	}
 	
 	
+	/**
+	 * 
+	 * @param unknown_type $new_text_index
+	 * @param unknown_type $folder
+	 * @throws transtable_exception
+	 */
+	public function add_index($new_text_index, $folder){
+	
+		$this->require_edit_index_permission();
+		
+		$folder = $this->check_path($folder);
+		
+		$new_text_index = trim($new_text_index);
+		
+		$translations = $this->get_all_translations($folder);
+		
+		// for each translation file in folder
+		foreach ($translations as $folder => $data) {
+				
+			if($folder == $folder){
+				foreach ($data['translations'] as $file_name => $translations) {
+					
+					// todo: check if index exists
+					
+					// full path to file with translations
+					$file_path = $this->check_path($folder . $file_name, 'return_absolute_path');
+						
+					$new_php_index = $this->get_php_index($new_text_index);
+					
+					eval('$translations' . $new_php_index . ' = ""');
+											
+					// write file
+					$this->write_translation_file($file_path, $translations);
+				}
+			}
+		}
+	}
+	
 	
 	/**
-	 * Changes a key in an array while maintaining the order.
+	 */
+	public function delete_index($new_text_index, $folder){
+	
+	}
+	
+	
+	/**
+	 */
+	public function delete_translation($text_index, $folder, $file){
+	
+	}
+	
+	
+	protected function require_edit_index_permission(){
+	
+		if(!$this->config['enable_edit_indexes'])
+			throw new transtable_exception("Editing indexes not enabled.");
+	}
+	
+	/**
+	 * Changes a key in an array while maintaining the order if possible.
 	 * 
 	 * @param array $array
-	 * @param string $old_key
-	 * @param string $new_key
+	 * @param string $old_text_index
+	 * @param string $new_text_index
 	 * @return array
 	 */
-	protected function replace_array_key($array, $old_text_key, $new_text_key){
+	protected function replace_array_key($array, $old_text_index, $new_text_index){
 		
-		// if key is array
+		// if indexes are same
+		if($old_text_index == $new_text_index)
+			return $array;
 		
-			// unset value alement and check if other arrays are empty
+		// if new index is subindex
+		//if()
+			
+		// if new index already exists
 		
-		$keys = array_keys($array);
-		$index = array_search($old_key, $keys);
-	
-		if ($index !== false) {
-			$keys[$index] = $new_key;
-			$array = array_combine($keys, $array);
+		
+		// if old key is array
+		if(strpos($old_text_index, $this->config['array_delimiter']) !== false){
+			$all_old_indexes = explode($this->config['array_delimiter'], $old_text_index);
+			$count_all_old_indexes = count($all_old_indexes);
+			$old_text_index_temp = $old_text_index;
+			
+			$old_php_index = $this->get_php_index($old_text_index);
+			$new_php_index = $this->get_php_index($new_text_index);
+			
+			
+			// translation text
+			eval('$translation = $array' . $old_php_index . ';');
+			// delete old value
+			eval('unset($array' . $old_php_index . ');');
+			// set value with new index
+			eval('$array' . $new_php_index . ' = $translation;');
+			
+			for ($i = 1; $i < $count_all_old_indexes; $i++) {
+				// bla|bla|bla => bla|bla
+				$old_text_index_temp = substr($old_text_index_temp, 0, strrpos($old_text_index_temp, $this->config['array_delimiter']));
+				// bla|bla => ['bla']['bla']
+				$old_php_index_temp = $this->get_php_index($old_text_index_temp);
+				
+				eval('$tval = $array' . $old_php_index_temp . ';');
+				
+				// if $tval is empty array unset it
+				if(!$tval && is_array($tval))
+					eval('unset($array' . $old_php_index_temp . ');');
+				else
+					break;
+			}
 		}
-	
+		// if new key is array
+		else if(strpos($new_text_index, $this->config['array_delimiter']) !== false){
+			
+			$new_php_index = $this->get_php_index($new_text_index);
+			
+			// translation text
+			$translation = $array[$old_text_index];
+			// delete old value
+			unset($array[$old_text_index]);
+			// set value with new index
+			eval('$array' . $new_php_index . ' = $translation;');
+		}
+		else{
+			$keys = array_keys($array);
+			$index = array_search($old_text_index, $keys);
+		
+			if ($index !== false) {
+				$keys[$index] = $new_text_index;
+				$array = array_combine($keys, $array);
+			}
+		}
+		
 		return $array;
 	}
 }
