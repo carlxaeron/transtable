@@ -59,6 +59,9 @@
 	} 
 	?>
 </table>
+<?php if($enable_add_index){ ?>
+<button type="button" id="transtable_add_index">Add translation</button>
+<?php } ?>
 
 <input id="transtable_open_folder" type="hidden" value="<?php echo htmlspecialchars($folder) ?>" />
 

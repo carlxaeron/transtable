@@ -35,6 +35,12 @@ if($action == 'index'){
 	$dully->assign('data', $translations);
 	$dully->assign('folder', '/');
 	$dully->assign('page_title', $TTCFG['php_array_files']['page_title']);
+	$dully->assign('enable_html_editor', $TTCFG['php_array_files']['enable_html_editor']);
+	$dully->assign('enable_edit_index', $TTCFG['php_array_files']['enable_edit_index']);
+	$dully->assign('enable_delete_index', $TTCFG['php_array_files']['enable_delete_index']);
+	$dully->assign('enable_add_index', $TTCFG['php_array_files']['enable_add_index']);
+	
+	
 	$dully->assign('page_content', $dully->fetch('translation_table.tpl'));
 	
 	echo $dully->fetch('main.tpl');
@@ -397,7 +403,7 @@ class transtable{
 	
 	protected function require_edit_index_permission(){
 	
-		if(!$this->config['enable_edit_indexes'])
+		if(!$this->config['enable_edit_index'])
 			throw new transtable_exception("Editing indexes not enabled.");
 	}
 	
