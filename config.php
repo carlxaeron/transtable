@@ -19,7 +19,13 @@ $TTCFG['php_array_files']['page_title'] = 'Transtable';
 $TTCFG['php_array_files']['enable_html_editor'] = true;
 
 // enable editing indexes (first column)
-$TTCFG['php_array_files']['enable_edit_indexes'] = true;
+$TTCFG['php_array_files']['enable_edit_index'] = true;
 
-// translation file newlines
-$TTCFG['php_array_files']['new_lines'] = PHP_EOL; // "\n" "\r\n"
+// enable deleting translations
+$TTCFG['php_array_files']['enable_delete_index'] = true;
+
+// enable deleting translations
+$TTCFG['php_array_files']['enable_add_index'] = true;
+
+// generated translation file newlines
+$TTCFG['php_array_files']['new_lines'] = PHP_EOL;
