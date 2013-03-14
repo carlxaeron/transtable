@@ -6,7 +6,7 @@
 </ul>
 
 <!-- table with translations -->
-<table id="transtable_table">
+<table border="0" cellpadding="2" cellspacing="5" id="transtable_table">
 	
 	<?php 
 	$_row_index = 0;
@@ -19,17 +19,17 @@
 	<?php if($_row_index == 0){ ?>
 	<tr>
 		<?php if($enable_delete_translation){ ?>
-		<td>&nbsp;</td>
+		<th>&nbsp;</th>
 		<?php } ?>
 
-		<td>&nbsp;</td>
+		<th>&nbsp;</th>
 		<?php 
 		$_column_index = 1;
 		foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
 		?>
-		<td id="transtable_file_name<?php echo $_column_index ?>">
+		<th id="transtable_file_name<?php echo $_column_index ?>">
 			<?php echo substr($_file_name, 0, strrpos($_file_name, '.')); ?>
-		</td>
+		</th>
 		<?php
 			$_column_index++;
 		} 
@@ -47,7 +47,7 @@
 	<tr id="transtable_row<?php echo $_translation_id ?>">
 		
 		<?php if($enable_delete_translation){ ?>
-		<td><a href="#" class="transtable_del_link" data-transtable-translation-id="<?php echo $_translation_id ?>">X</a></td>
+		<td class="transtable_del_cell"><a href="#" class="transtable_del_link" data-transtable-translation-id="<?php echo $_translation_id ?>">X</a></td>
 		<?php } ?>
 		
 		<td class="transtable_index_cell" id="transtable_trans_index<?php echo $_translation_id ?>">
@@ -74,7 +74,7 @@
 	<!-- row for new translation -->
 	<tr id="transtable_new_template" class="transtable_hidden">
 		<?php if($enable_delete_translation){ ?>
-		<td><a href="#" class="transtable_del_link" data-transtable-translation-id="<?php echo $_translation_id ?>">X</a></td>
+		<td class="transtable_del_cell"><a href="#" class="transtable_del_link" data-transtable-translation-id="<?php echo $_translation_id ?>">X</a></td>
 		<?php } ?>
 		<td class="transtable_index_cell" id="transtable_trans_index##ID##">_##ID##</td>
 		<?php foreach ($data[$folder]['translations'] as $_file_name => $_translations){ ?>
@@ -85,10 +85,11 @@
 	
 </table>
 <?php if($enable_add_translation){ ?>
-<button type="button" id="transtable_add_index">Add translation</button>
+<button class="transtable_btt transtable_btt_orange transtable_btt_medium" type="button" id="transtable_add_index">Add new translation</button>
 <?php } ?>
 
 <input id="transtable_open_folder" type="hidden" value="<?php echo htmlspecialchars($folder) ?>" />
+<input id="transtable_enable_html_editor" type="hidden" value="<?php echo $enable_html_editor?1:0 ?>" />
 
 <script type="text/javascript">
 	$(document).ready(function () {
