@@ -492,3 +492,23 @@ class transtable{
  */
 class transtable_exception extends Exception{}
 
+
+/**
+ * Writes php code of translation files.
+ * Used to write php translation files.
+ */
+function echo_translation_array($translations, $var_name, $arr_level = ''){
+
+	foreach ($translations as $index => $translation){
+
+		$arr_level1 = $arr_level . "['" . $index . "']";
+
+		if(is_array($translation)){
+			echo_translation_array($translation, $var_name, $arr_level1);
+		}
+		else
+			echo '$' . $var_name . $arr_level1 . " = '" . addslashes($translation) . "';\n";
+	}
+
+}
+
