@@ -22,10 +22,10 @@ $TTCFG['php_array_files']['enable_html_editor'] = true;
 $TTCFG['php_array_files']['enable_edit_index'] = true;
 
 // enable deleting translations
-$TTCFG['php_array_files']['enable_delete_index'] = true;
+$TTCFG['php_array_files']['enable_delete_translation'] = true;
 
 // enable deleting translations
-$TTCFG['php_array_files']['enable_add_index'] = true;
+$TTCFG['php_array_files']['enable_add_translation'] = true;
 
 // generated translation file newlines
 $TTCFG['php_array_files']['new_lines'] = PHP_EOL;

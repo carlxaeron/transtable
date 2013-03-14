@@ -1,4 +1,3 @@
-<pre>
 <?php
 
 include 'config.php';
@@ -15,7 +14,7 @@ else
 
 
 /**
- * Controller
+ * Controller part
  */
 
 // main page
@@ -37,8 +36,8 @@ if($action == 'index'){
 	$dully->assign('page_title', $TTCFG['php_array_files']['page_title']);
 	$dully->assign('enable_html_editor', $TTCFG['php_array_files']['enable_html_editor']);
 	$dully->assign('enable_edit_index', $TTCFG['php_array_files']['enable_edit_index']);
-	$dully->assign('enable_delete_index', $TTCFG['php_array_files']['enable_delete_index']);
-	$dully->assign('enable_add_index', $TTCFG['php_array_files']['enable_add_index']);
+	$dully->assign('enable_delete_translation', $TTCFG['php_array_files']['enable_delete_translation']);
+	$dully->assign('enable_add_translation', $TTCFG['php_array_files']['enable_add_translation']);
 	
 	
 	$dully->assign('page_content', $dully->fetch('translation_table.tpl'));
@@ -48,20 +47,21 @@ if($action == 'index'){
 
 // save translation
 else if($action == 'savetranslation'){
-	
 	$transtable = new transtable();
-	
 	echo $transtable->save_translation($_POST['file_name'], $_POST['index'], $_POST['translation']);
 }
 
 // save index
 else if($action == 'saveindex'){
-
 	$transtable = new transtable();
-
 	echo $transtable->rename_index($_POST['old_index'], $_POST['new_index'], $_POST['folder']);
 }
 
+// delete index (row)
+else if($action == 'deleteindex'){
+	$transtable = new transtable();
+	echo $transtable->delete_index($_POST['index'], $_POST['folder']);
+}
 
 
 
@@ -246,7 +246,7 @@ class transtable{
 		eval('${$this->config[\'var_name\']}' . $this->get_php_index($index) . ' = $translation;');
 		
 		// save file
-		$this->write_translation_file($file_path_clean, $translations);
+		$this->write_translation_file($file_path_clean, $t);
 		
 		return 1;
 	}
@@ -343,24 +343,25 @@ class transtable{
 					// write file
 					$this->write_translation_file($file_path, $translations);
 				}
+				
+				break;
 			}
 		}
 	}
 	
 	
 	/**
-	 * 
-	 * @param unknown_type $new_text_index
-	 * @param unknown_type $folder
-	 * @throws transtable_exception
 	 */
-	public function add_index($new_text_index, $folder){
-	
-		$this->require_edit_index_permission();
+	public function delete_index($text_index, $folder){
+		
+		$this->require_delete_translation_permission();
 		
 		$folder = $this->check_path($folder);
 		
-		$new_text_index = trim($new_text_index);
+		$text_index = trim($text_index);
+		
+		if(!$text_index)
+			throw new transtable_exception("Error. Old or new index name not set.");
 		
 		$translations = $this->get_all_translations($folder);
 		
@@ -369,28 +370,22 @@ class transtable{
 				
 			if($folder == $folder){
 				foreach ($data['translations'] as $file_name => $translations) {
-					
-					// todo: check if index exists
-					
+		
 					// full path to file with translations
 					$file_path = $this->check_path($folder . $file_name, 'return_absolute_path');
 						
-					$new_php_index = $this->get_php_index($new_text_index);
-					
-					eval('$translations' . $new_php_index . ' = ""');
-											
+					// delete index
+					eval('unset($translations' . $this->get_php_index($text_index) . ');');
+						
 					// write file
 					$this->write_translation_file($file_path, $translations);
 				}
+				
+				break;
 			}
 		}
-	}
-	
-	
-	/**
-	 */
-	public function delete_index($new_text_index, $folder){
-	
+		
+		return 1;
 	}
 	
 	
@@ -405,6 +400,12 @@ class transtable{
 	
 		if(!$this->config['enable_edit_index'])
 			throw new transtable_exception("Editing indexes not enabled.");
+	}
+	
+	protected function require_delete_translation_permission(){
+	
+		if(!$this->config['enable_delete_translation'])
+			throw new transtable_exception("Deleting translations is not enabled.");
 	}
 	
 	/**

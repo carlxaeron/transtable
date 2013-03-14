@@ -40,12 +40,21 @@ transtable.CKeditor_config = {
  * Initialize translation table
  */
 transtable.init_table = function(){
-	$('#transtable_table').on('dblclick', '[data-transtable-translaion-id]', function(e){		
-		transtable.edit_translation($(e.target).attr('data-transtable-translaion-id'));
+	$('#transtable_table').on('dblclick', '[data-transtable-translation-id]', function(e){		
+		transtable.edit_translation($(e.target).attr('data-transtable-translation-id'));
 	});
 	
 	$('#transtable_table').on('dblclick', '.transtable_index_cell', function(e){		
 		transtable.edit_index($(e.target).attr('id'));
+	});
+	
+	$('#transtable_add_index').on('click', function(e){		
+		transtable.add_index();
+	});
+	
+	$('#transtable_table').on('click', '.transtable_del_link', function(e){		
+		e.preventDefault();
+		transtable.delete_index($(e.target).attr('data-transtable-translation-id'));
 	});
 }
 
@@ -63,11 +72,11 @@ transtable.edit_translation = function(translation_id){
 	var cancel_button = $('<button type="button">Cancel</button>');
 	
 	save_button.on('click', function(e){		
-		transtable.save_translation($(e.target).parent('td').attr('data-transtable-translaion-id'));
+		transtable.save_translation($(e.target).parent('td').attr('data-transtable-translation-id'));
 	});
 	
 	cancel_button.on('click', function(e){		
-		transtable.cancel_edit_translation($(e.target).parent('td').attr('data-transtable-translaion-id'));
+		transtable.cancel_edit_translation($(e.target).parent('td').attr('data-transtable-translation-id'));
 	});
 	
 	transtable.cancel_content[translation_id] = cell.html();
@@ -146,10 +155,10 @@ transtable.save_translation = function(translation_id){
 	var cell = $('#transtable_cell_' + translation_id);
 	
 	var column = cell[0].cellIndex;
-	var row = cell[0].parentNode.rowIndex;
+	//var row = cell[0].parentNode.rowIndex;
 		
 	var file_name = $.trim($('#transtable_file_name' + column).html());
-	var index = $.trim($('#transtable_trans_index' + row).html());
+	var index = $.trim($('#transtable_trans_index' + translation_id).html());
 	
 	
 	// if ck editor is enabled
@@ -190,4 +199,41 @@ transtable.rename_index = function(td_id){
 		}
 	});
 }
+
+
+/**
+ * Deletes index
+ */
+transtable.delete_index = function(translation_id){
+	
+	var index = $.trim($('#transtable_trans_index' + translation_id).html());
+	
+	if(confirm('Are you shure you want to delete all translations in the row?')){
+		$.ajax({
+			type: 'POST',
+			url: '?transtable_action=deleteindex',
+			data: {index:index, folder:$('#transtable_open_folder').val()},
+			success: function(reponse){
+				if(reponse == 1)
+					$('#transtable_row' + translation_id).remove();
+			}
+		});
+	}
+}
+
+
+/**
+ * Renames add index
+ */
+transtable.add_index = function(){
+	
+	var template = $('#transtable_new_template').html();
+	
+	var id = Math.random().toString(36).substring(2, 12);
+	
+	template = '<tr>' + template.replace(/##ID##/gi, id) + '</tr>';
+	
+	$('#transtable_new_template').before(template);
+}
+
 
