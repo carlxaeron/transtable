@@ -68,8 +68,8 @@ transtable.edit_translation = function(translation_id){
 	
 	var cell = $('#transtable_cell_' + translation_id);
 	var textarea = $('<textarea id="transtable_edit_' + translation_id + '" >' + cell.html() + '</textarea>');
-	var save_button = $('<button type="button">Save</button>');
-	var cancel_button = $('<button type="button">Cancel</button>');
+	var save_button = $('<button class="transtable_btt transtable_btt_orange transtable_btt_small" type="button">Save</button>');
+	var cancel_button = $('<button class="transtable_btt transtable_btt_orange transtable_btt_small" type="button">Cancel</button>');
 	
 	save_button.on('click', function(e){		
 		transtable.save_translation($(e.target).parent('td').attr('data-transtable-translation-id'));
@@ -84,7 +84,8 @@ transtable.edit_translation = function(translation_id){
 	cell.html('');
 	cell.append(textarea, save_button, cancel_button);
 	//$("#"+id).focus();
-	CKEDITOR.replace('transtable_edit_' + translation_id, transtable.CKeditor_config);
+	if($('#transtable_enable_html_editor').val() == 1)
+		CKEDITOR.replace('transtable_edit_' + translation_id, transtable.CKeditor_config);
 }
 
 
@@ -98,9 +99,9 @@ transtable.edit_index = function(td_id){
 	
 	transtable.cancel_index[td_id] = old_index;
 	
-	var input = $('<input id="' + td_id + 'edit" type="text" value="' + old_index + '" />');
-	var save_button = $('<button type="button">Save</button>');
-	var cancel_button = $('<button type="button">Cancel</button>');
+	var input = $('<input class="transtable_index_input" id="' + td_id + 'edit" type="text" value="' + old_index + '" />');
+	var save_button = $('<button class="transtable_btt transtable_btt_orange transtable_btt_small" type="button">Save</button>');
+	var cancel_button = $('<button class="transtable_btt transtable_btt_orange transtable_btt_small" type="button">Cancel</button>');
 	
 	save_button.on('click', function(e){		
 		transtable.rename_index($(e.target).parent('td').attr('id'));
