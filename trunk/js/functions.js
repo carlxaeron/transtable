@@ -158,7 +158,7 @@ transtable.save_translation = function(translation_id){
 	var column = cell[0].cellIndex;
 	//var row = cell[0].parentNode.rowIndex;
 		
-	var file_name = $.trim($('#transtable_file_name' + column).html());
+	var file_name = $.trim($('#transtable_file_name' + column).val());
 	var index = $.trim($('#transtable_trans_index' + translation_id).html());
 	
 	
