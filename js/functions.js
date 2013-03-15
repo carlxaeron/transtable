@@ -32,8 +32,12 @@ transtable.CKeditor_config = {
 		],
 	height : '100px',
 	enterMode : CKEDITOR.ENTER_BR,
-	shiftEnterMode: CKEDITOR.ENTER_P
+	shiftEnterMode: CKEDITOR.ENTER_P,
+	disableAutoInline: true
 };
+
+
+CKEDITOR.disableAutoInline = true;
 
 
 /**
@@ -67,6 +71,7 @@ transtable.edit_translation = function(translation_id){
 	//console.log(translation_id);
 	
 	var cell = $('#transtable_cell_' + translation_id);
+	/*
 	var textarea = $('<textarea id="transtable_edit_' + translation_id + '" >' + cell.html() + '</textarea>');
 	var save_button = $('<button class="transtable_btt transtable_btt_orange transtable_btt_small" type="button">Save</button>');
 	var cancel_button = $('<button class="transtable_btt transtable_btt_orange transtable_btt_small" type="button">Cancel</button>');
@@ -86,6 +91,9 @@ transtable.edit_translation = function(translation_id){
 	//$("#"+id).focus();
 	if($('#transtable_enable_html_editor').val() == 1)
 		CKEDITOR.replace('transtable_edit_' + translation_id, transtable.CKeditor_config);
+	*/
+	
+	CKEDITOR.inline('transtable_translation' + translation_id, transtable.CKeditor_config);
 }
 
 
