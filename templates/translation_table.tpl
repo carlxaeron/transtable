@@ -4,7 +4,7 @@
 if(count($data) > 1 )
 foreach ($data as $_tab_name => $_null){ 
 ?>
-<a class="transtable_btt transtable_btt_white transtable_btt_rounded" href="?transtable_folder=<?php echo urlencode($_tab_name) ?>"><?php echo htmlspecialchars($_tab_name); ?></a>
+<a class="transtable_btt transtable_btt_white transtable_btt_rounded transtable_btt_small" href="?transtable_folder=<?php echo urlencode($_tab_name) ?>"><?php echo htmlspecialchars($_tab_name); ?></a>
 <?php } ?>
 
 <!-- table with translations -->
@@ -57,18 +57,14 @@ foreach ($data as $_tab_name => $_null){
 			<?php echo htmlspecialchars($_index) ?>
 		</td>
 		<?php 
-		$_column_index = 1;
 		foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
 		?>
-		<td class="transtable_translation_cell" data-transtable-translation-id="<?php echo $_translation_id ?>" id="transtable_cell_<?php echo $_translation_id ?>">
-			<div contenteditable="true" id="transtable_translation<?php echo $_translation_id ?>" class="transtable_edit_div">
+		<td class="transtable_translation_cell">
+			<div contenteditable="true" data-transtable-translation-id="<?php echo $_translation_id ?>" id="transtable_translation<?php echo md5($_translation_id . $_file_name) ?>" class="transtable_edit_div">
 				<?php @eval('echo htmlspecialchars($_translations' . $translate->get_php_index($_index) . ');'); ?>
 			</div>
 		</td>
-		<?php 
-			$_column_index++;
-		} 
-		?>
+		<?php } ?>
 	</tr>
 	<?php 
 		$_row_index++;

@@ -12,9 +12,11 @@ a:hover{
 	text-decoration:underline;
 }
 
+/*
 #transtable_table td{
 	height: 50px;
 }
+*/
 
 .transtable_hidden {
 	display: none;
