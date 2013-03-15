@@ -24,11 +24,11 @@ transtable.CKeditor_config = {
 			['Source'],
 			['Cut','Copy','Paste','PasteText','PasteFromWord'],
 			['Undo','Redo','-','SelectAll','RemoveFormat'],
+			['Link','Unlink'],
 			'/',
 			['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
 			['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
-			['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-			['Link','Unlink'],
+			['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock']
 		],
 	height : '100px',
 	enterMode : CKEDITOR.ENTER_BR,
@@ -44,8 +44,8 @@ CKEDITOR.disableAutoInline = true;
  * Initialize translation table
  */
 transtable.init_table = function(){
-	$('#transtable_table').on('dblclick', '[data-transtable-translation-id]', function(e){		
-		transtable.edit_translation($(e.target).attr('data-transtable-translation-id'));
+	$('#transtable_table').on('click', '.transtable_edit_div', function(e){
+		transtable.edit_translation($(e.target).attr('id'));
 	});
 	
 	$('#transtable_table').on('dblclick', '.transtable_index_cell', function(e){		
@@ -66,34 +66,11 @@ transtable.init_table = function(){
 /**
  * Edits translation
  */
-transtable.edit_translation = function(translation_id){
+transtable.edit_translation = function(edit_div_id){
 	
-	//console.log(translation_id);
-	
-	var cell = $('#transtable_cell_' + translation_id);
-	/*
-	var textarea = $('<textarea id="transtable_edit_' + translation_id + '" >' + cell.html() + '</textarea>');
-	var save_button = $('<button class="transtable_btt transtable_btt_orange transtable_btt_small" type="button">Save</button>');
-	var cancel_button = $('<button class="transtable_btt transtable_btt_orange transtable_btt_small" type="button">Cancel</button>');
-	
-	save_button.on('click', function(e){		
-		transtable.save_translation($(e.target).parent('td').attr('data-transtable-translation-id'));
-	});
-	
-	cancel_button.on('click', function(e){		
-		transtable.cancel_edit_translation($(e.target).parent('td').attr('data-transtable-translation-id'));
-	});
-	
-	transtable.cancel_content[translation_id] = cell.html();
-	
-	cell.html('');
-	cell.append(textarea, save_button, cancel_button);
-	//$("#"+id).focus();
-	if($('#transtable_enable_html_editor').val() == 1)
-		CKEDITOR.replace('transtable_edit_' + translation_id, transtable.CKeditor_config);
-	*/
-	
-	CKEDITOR.inline('transtable_translation' + translation_id, transtable.CKeditor_config);
+	// init html editor
+	if($('#transtable_enable_html_editor').val() == 1 && !CKEDITOR.instances[edit_div_id])
+		CKEDITOR.inline(edit_div_id, transtable.CKeditor_config);
 }
 
 
@@ -133,10 +110,10 @@ transtable.cancel_edit_translation = function(translation_id, translation){
 	if(translation)
 		transtable.cancel_content[translation_id] = translation;
 	
-	if(CKEDITOR.instances['transtable_edit_' + translation_id])
-		CKEDITOR.instances['transtable_edit_' + translation_id].destroy();
+	if(CKEDITOR.instances['transtable_translation' + translation_id])
+		CKEDITOR.instances['transtable_translation' + translation_id].destroy();
 	
-	$('#transtable_cell_' + translation_id).html(transtable.cancel_content[translation_id]);
+	$('#transtable_translation' + translation_id).html(transtable.cancel_content[translation_id]);
 	delete transtable.cancel_content[translation_id];
 	
 }
@@ -161,22 +138,18 @@ transtable.cancel_edit_index = function(td_id, index){
  */
 transtable.save_translation = function(translation_id){
 	
-	var cell = $('#transtable_cell_' + translation_id);
-	
 	var column = cell[0].cellIndex;
 	//var row = cell[0].parentNode.rowIndex;
 		
 	var file_name = $.trim($('#transtable_file_name' + column).val());
 	var index = $.trim($('#transtable_trans_index' + translation_id).html());
 	
-	
 	// if ck editor is enabled
-	if(CKEDITOR.instances['transtable_edit_' + translation_id]){
-		var ck_instance = CKEDITOR.instances['transtable_edit_' + translation_id];
-		var translation = ck_instance.getData();
+	if(CKEDITOR.instances['transtable_translation' + translation_id]){
+		var translation = $.trim(CKEDITOR.instances['transtable_translation' + translation_id].getData());
 	}
 	else
-		translation = $('transtable_edit_' + translation_id).val();
+		translation = $.trim($('transtable_translation' + translation_id).html());
 	
 	$.ajax({
 		type: 'POST',
