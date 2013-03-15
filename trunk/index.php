@@ -22,26 +22,30 @@ if($action == 'index'){
 	
 	$transtable = new transtable();
 	
-	// get all translations from the root folder
-	$translations = $transtable->get_all_translations('/');
+	// get all translations from folder
+	if(isset($_GET['transtable_folder']) && $_GET['transtable_folder'])
+		$folder = $_GET['transtable_folder'];
+	else
+		$folder = '/';
 	
-	//print_r($translations);
+	$translations = $transtable->get_all_translations($folder);
 	
-	// display template
+	// print_r($translations);
+	
 	$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
 	
 	$dully->assign('translate', $transtable);
 	$dully->assign('data', $translations);
-	$dully->assign('folder', '/');
+	$dully->assign('folder', $folder);
 	$dully->assign('page_title', $TTCFG['php_array_files']['page_title']);
 	$dully->assign('enable_html_editor', $TTCFG['php_array_files']['enable_html_editor']);
 	$dully->assign('enable_edit_index', $TTCFG['php_array_files']['enable_edit_index']);
 	$dully->assign('enable_delete_translation', $TTCFG['php_array_files']['enable_delete_translation']);
 	$dully->assign('enable_add_translation', $TTCFG['php_array_files']['enable_add_translation']);
 	
-	
 	$dully->assign('page_content', $dully->fetch('translation_table.tpl'));
 	
+	// display template
 	echo $dully->fetch('main.tpl');
 }
 
@@ -123,9 +127,9 @@ class transtable{
 				continue;
 				
 			// folder relative path
-			$folder = '/' . substr_replace(dirname($path), '', 0, $root_path_len);
+			$folder = '/' . substr_replace(dirname($path), '', 0, $root_path_len-1);
 			
-			// include the file with translations
+			
 			if(!$for_folder or $for_folder == $folder){
 				
 				// reset variable with translations
@@ -266,7 +270,7 @@ class transtable{
 		$dully->assign('var_name', $this->config['var_name']);
 		
 		// php file content
-		$file_content = $dully->fetch('lang_file.tpl');
+		$file_content = $dully->fetch('translation_file.tpl');
 		
 		// normalize new lines
 		str_replace(array("\r\n","\r"), "\n", $file_content);
@@ -293,7 +297,7 @@ class transtable{
 		$file_path_clean = realpath($this->config['root_dir'] . '/' . $file_path_relative);
 	
 		if(!$file_path_clean)
-			throw new transtable_exception("File $file_path doesn't exists");
+			throw new transtable_exception("File $file_path_relative doesn't exists");
 	
 		// check if file is subdir
 		$root_dir = realpath($this->config['root_dir']);

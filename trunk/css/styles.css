@@ -27,6 +27,10 @@ a:hover{
 	-moz-border-radius: 6px;
 }
 
+.transtable_translation_cell:hover{
+	background-color: #FFEED5;
+}
+
 
 .transtable_index_cell{
 	background-color: #999;
@@ -50,6 +54,7 @@ a:hover{
 
 .transtable_del_cell{
 	width: 10px;
+	background-color: #666;
 }
 
 .transtable_del_link{
@@ -60,6 +65,23 @@ a:hover{
 .transtable_del_link:hover{
 	text-decoration:none;
 }
+
+#transtable_add_index{
+	margin-left: 23px;
+	margin-top: 10px;
+}
+
+.transtable_help{
+	margin-left: 23px;
+	font-weight: bold;
+	color: #FFF;
+	margin-top: 20px;	
+}
+
+.transtable_edit_div{
+	min-height: 50px;
+}
+
 
 /* button 
 from: http://webdesignerwall.com/tutorials/css3-gradient-buttons */

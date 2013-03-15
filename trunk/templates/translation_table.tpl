@@ -4,7 +4,7 @@
 if(count($data) > 1 )
 foreach ($data as $_tab_name => $_null){ 
 ?>
-<button class="transtable_btt transtable_btt_white transtable_btt_rounded" type="button"><?php echo htmlspecialchars($_tab_name); ?></button>
+<a class="transtable_btt transtable_btt_white transtable_btt_rounded" href="?transtable_folder=<?php echo urlencode($_tab_name) ?>"><?php echo htmlspecialchars($_tab_name); ?></a>
 <?php } ?>
 
 <!-- table with translations -->
@@ -24,7 +24,7 @@ foreach ($data as $_tab_name => $_null){
 		<th>&nbsp;</th>
 		<?php } ?>
 
-		<th class="transtable_header_cell">Index</th>
+		<th class="transtable_header_cell">index</th>
 		<?php 
 		$_column_index = 1;
 		foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
@@ -61,7 +61,9 @@ foreach ($data as $_tab_name => $_null){
 		foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
 		?>
 		<td class="transtable_translation_cell" data-transtable-translation-id="<?php echo $_translation_id ?>" id="transtable_cell_<?php echo $_translation_id ?>">
-			<?php @eval('echo htmlspecialchars($_translations' . $translate->get_php_index($_index) . ');'); ?>
+			<div contenteditable="true" id="transtable_translation<?php echo $_translation_id ?>" class="transtable_edit_div">
+				<?php @eval('echo htmlspecialchars($_translations' . $translate->get_php_index($_index) . ');'); ?>
+			</div>
 		</td>
 		<?php 
 			$_column_index++;
@@ -90,6 +92,10 @@ foreach ($data as $_tab_name => $_null){
 <?php if($enable_add_translation){ ?>
 <button class="transtable_btt transtable_btt_orange transtable_btt_medium" type="button" id="transtable_add_index">Add new translation</button>
 <?php } ?>
+
+<div class="transtable_help">
+Double click on translation to edit.
+</div>
 
 <input id="transtable_open_folder" type="hidden" value="<?php echo htmlspecialchars($folder) ?>" />
 <input id="transtable_enable_html_editor" type="hidden" value="<?php echo $enable_html_editor?1:0 ?>" />
