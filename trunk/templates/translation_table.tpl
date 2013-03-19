@@ -47,21 +47,24 @@ foreach ($data as $_tab_name => $_null){
 	<?php 
 		$_translation_id = 't' . md5($_file_name . rand() . microtime());
 	?>
-	<tr id="transtable_row<?php echo $_translation_id ?>">
+	<tr id="transtable_row<?php echo $_translation_id ?>" data-transtable-translation-id="<?php echo $_translation_id ?>">
 		
 		<?php if($enable_delete_translation){ ?>
-		<td class="transtable_del_cell"><a href="#" class="transtable_del_link" data-transtable-translation-id="<?php echo $_translation_id ?>" title="Delete translation">&times;</a></td>
+		<td class="transtable_del_cell"><a href="#" class="transtable_del_link" title="Delete translation">&times;</a></td>
 		<?php } ?>
 		
-		<td class="transtable_index_cell" id="transtable_trans_index<?php echo $_translation_id ?>">
-			<?php echo htmlspecialchars($_index) ?>
+		<td class="transtable_index_cell">
+			<div id="transtable_index_div<?php echo $_translation_id ?>">
+				<?php echo htmlspecialchars($_index) ?>
+			</div>
+			<input id="transtable_index<?php echo $_translation_id ?>" type="hidden" value="<?php echo htmlspecialchars($_index) ?>" />
 		</td>
 		<?php 
 		foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
 		?>
 		<td class="transtable_translation_cell">
-			<div contenteditable="true" data-transtable-translation-id="<?php echo $_translation_id ?>" id="transtable_translation<?php echo md5($_translation_id . $_file_name) ?>" class="transtable_edit_div">
-				<?php @eval('echo htmlspecialchars($_translations' . $translate->get_php_index($_index) . ');'); ?>
+			<div contenteditable="true" class="transtable_edit_div">
+				<?php @eval('echo ($_translations' . $translate->get_php_index($_index) . ');'); ?>
 			</div>
 		</td>
 		<?php } ?>
@@ -70,19 +73,6 @@ foreach ($data as $_tab_name => $_null){
 		$_row_index++;
 	} 
 	?>
-	
-	<?php if($enable_add_translation){ ?>
-	<!-- row for new translation -->
-	<tr id="transtable_new_template" class="transtable_hidden">
-		<?php if($enable_delete_translation){ ?>
-		<td class="transtable_del_cell"><a href="#" class="transtable_del_link" data-transtable-translation-id="<?php echo $_translation_id ?>" title="Delete translation">&times;</a></td>
-		<?php } ?>
-		<td class="transtable_index_cell" id="transtable_trans_index##ID##">_##ID##</td>
-		<?php foreach ($data[$folder]['translations'] as $_file_name => $_translations){ ?>
-		<td class="transtable_translation_cell" data-transtable-translation-id="##ID##" id="transtable_cell_##ID##"></td>
-		<?php } ?>
-	</tr>
-	<?php } ?>
 	
 </table>
 <?php if($enable_add_translation){ ?>
