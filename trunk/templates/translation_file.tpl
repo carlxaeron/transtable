@@ -6,5 +6,5 @@
 
 <?php
 
-echo_translation_array($t, $var_name);
+transtable_echo_translation_array($t, $var_name);
 

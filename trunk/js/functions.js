@@ -20,7 +20,7 @@ transtable.CKeditor_config = {
 	toolbar : 'Transtable',
 	toolbar_Transtable :
 		[
-			['Source'],
+			// ['Source'],
 			['Cut','Copy','Paste','PasteText','PasteFromWord'],
 			['Undo','Redo','-','SelectAll','RemoveFormat'],
 			['Link','Unlink'],
@@ -29,7 +29,7 @@ transtable.CKeditor_config = {
 			['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
 			['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock']
 		],
-	height : '100px',
+	//height : '100px',
 	enterMode : CKEDITOR.ENTER_BR,
 	shiftEnterMode: CKEDITOR.ENTER_P,
 	disableAutoInline: true,
@@ -78,9 +78,15 @@ transtable.edit_translation = function(edit_div_id){
 	
 	transtable.cancel_content[edit_div_id] = $('#' + edit_div_id).html();
 	
-	// init html editor
-	if($('#transtable_enable_html_editor').val() == 1 && !CKEDITOR.instances[edit_div_id])
-		CKEDITOR.inline(edit_div_id, transtable.CKeditor_config);
+	// html editor
+	if($('#transtable_enable_html_editor').val() == 1){
+		if(!CKEDITOR.instances[edit_div_id])
+			CKEDITOR.inline(edit_div_id, transtable.CKeditor_config);
+	}
+	// txt editor
+	else{
+		
+	}
 }
 
 
@@ -90,7 +96,7 @@ transtable.edit_translation = function(edit_div_id){
 transtable.edit_index = function(td_element){
 	
 	var cell = $(td_element);
-	var translation_id = transtable.get_translation_id(edit_div_id);
+	var translation_id = transtable.get_translation_id(td_element);
 	var old_index = $('#transtable_index' + translation_id).val();
 	var input_div = $('#transtable_index_div' + translation_id);
 	
@@ -152,13 +158,13 @@ transtable.save_translation = function(edit_div_id){
 	
 	var edit_div = $('#' + edit_div_id);
 	var cell = edit_div.parent();
-	var translation_id = transtable.get_translation_id(edit_div_id);
+	var translation_id = transtable.get_translation_id(cell);
 	
 	var column = cell[0].cellIndex;
 	//var row = cell[0].parentNode.rowIndex;
-		
+	
 	var file_name = $.trim($('#transtable_file_name' + column).val());
-	var index = $.trim($('#transtable_trans_index' + translation_id).html());
+	var index = $.trim($('#transtable_index' + translation_id).val());
 	
 	// if ck editor is enabled
 	if(CKEDITOR.instances[edit_div_id]){
@@ -206,7 +212,7 @@ transtable.rename_index = function(translation_id){
  */
 transtable.delete_index = function(translation_id){
 	
-	var index = $.trim($('#transtable_trans_index' + translation_id).html());
+	var index = $.trim($('#transtable_index' + translation_id).val());
 	
 	if(confirm('Are you shure you want to delete all translations in the row?')){
 		$.ajax({
@@ -214,8 +220,12 @@ transtable.delete_index = function(translation_id){
 			url: '?transtable_action=deleteindex',
 			data: {index:index, folder:$('#transtable_open_folder').val()},
 			success: function(reponse){
-				if(reponse == 1)
-					$('#transtable_row' + translation_id).remove();
+				if(reponse == 1){
+					var row = $('#transtable_row' + translation_id);
+					row.hide('slow', function(){
+						row.remove();
+					});					
+				}
 			}
 		});
 	}
@@ -223,16 +233,15 @@ transtable.delete_index = function(translation_id){
 
 
 /**
- * Renames add index
+ * Returns translation id
  */
 transtable.get_translation_id = function(element_in_row){
 	return $(element_in_row).closest('tr').attr('data-transtable-translation-id');
 }
 
 
-
 /**
- * Renames add index
+ * Adds a new table row
  */
 transtable.add_index = function(){
 	
@@ -245,7 +254,7 @@ transtable.add_index = function(){
 	var patt = new RegExp(old_translation_id, 'g');
 	
 	template = 
-		'<tr id="transtable_row' + new_translation_id + '" data-transtable-translation-id="' + new_translation_id + '">' + 
+		'<tr class="transtable_hidden" id="transtable_row' + new_translation_id + '" data-transtable-translation-id="' + new_translation_id + '">' + 
 		template.replace(patt, new_translation_id) + 
 		'</tr>';
 	
@@ -257,6 +266,8 @@ transtable.add_index = function(){
 	$('#transtable_index' + new_translation_id).val(new_translation_id);
 	$('#transtable_index_div' + new_translation_id).html(new_translation_id);
 	$('#transtable_row' + new_translation_id + ' .transtable_edit_div').html('');
+	
+	// show new row
+	$('#transtable_row' + new_translation_id).show('slow');
 }
-
 
