@@ -9,7 +9,6 @@ transtable = {}
  * Temporary storage for original content while editing
  */
 transtable.cancel_content = {};
-transtable.cancel_index = {};
 
 
 /**
@@ -33,10 +32,19 @@ transtable.CKeditor_config = {
 	height : '100px',
 	enterMode : CKEDITOR.ENTER_BR,
 	shiftEnterMode: CKEDITOR.ENTER_P,
-	disableAutoInline: true
+	disableAutoInline: true,
+	on: {
+		blur: function(event) {
+			transtable.save_translation($(event.editor.element.$).attr('id'));
+	        }
+	}
+	
 };
 
 
+/**
+ * Do not auto initialize all html editors
+ */
 CKEDITOR.disableAutoInline = true;
 
 
@@ -49,7 +57,7 @@ transtable.init_table = function(){
 	});
 	
 	$('#transtable_table').on('dblclick', '.transtable_index_cell', function(e){		
-		transtable.edit_index($(e.target).attr('id'));
+		transtable.edit_index(e.currentTarget);
 	});
 	
 	$('#transtable_add_index').on('click', function(e){		
@@ -58,7 +66,7 @@ transtable.init_table = function(){
 	
 	$('#transtable_table').on('click', '.transtable_del_link', function(e){		
 		e.preventDefault();
-		transtable.delete_index($(e.target).attr('data-transtable-translation-id'));
+		transtable.delete_index(transtable.get_translation_id(e.target));
 	});
 }
 
@@ -67,6 +75,8 @@ transtable.init_table = function(){
  * Edits translation
  */
 transtable.edit_translation = function(edit_div_id){
+	
+	transtable.cancel_content[edit_div_id] = $('#' + edit_div_id).html();
 	
 	// init html editor
 	if($('#transtable_enable_html_editor').val() == 1 && !CKEDITOR.instances[edit_div_id])
@@ -77,27 +87,27 @@ transtable.edit_translation = function(edit_div_id){
 /**
  * Edits index
  */
-transtable.edit_index = function(td_id){
+transtable.edit_index = function(td_element){
 	
-	var cell = $('#' + td_id);
-	var old_index = $.trim(cell.html());
+	var cell = $(td_element);
+	var translation_id = transtable.get_translation_id(edit_div_id);
+	var old_index = $('#transtable_index' + translation_id).val();
+	var input_div = $('#transtable_index_div' + translation_id);
 	
-	transtable.cancel_index[td_id] = old_index;
-	
-	var input = $('<input class="transtable_index_input" id="' + td_id + 'edit" type="text" value="' + old_index + '" />');
+	var input = $('<input class="transtable_index_input" id="transtable_index_input' + translation_id + '" type="text" value="' + old_index + '" />');
 	var save_button = $('<button class="transtable_btt transtable_btt_orange transtable_btt_small" type="button">Save</button>');
 	var cancel_button = $('<button class="transtable_btt transtable_btt_orange transtable_btt_small" type="button">Cancel</button>');
 	
 	save_button.on('click', function(e){		
-		transtable.rename_index($(e.target).parent('td').attr('id'));
+		transtable.rename_index(transtable.get_translation_id(e.target));
 	});
 	
-	cancel_button.on('click', function(e){		
-		transtable.cancel_edit_index($(e.target).parent('td').attr('id'));
+	cancel_button.on('click', function(e){
+		transtable.cancel_edit_index(transtable.get_translation_id(e.target));
 	});
 	
-	cell.html('');
-	cell.append(input, save_button, cancel_button);
+	input_div.html('');
+	input_div.append(input, save_button, cancel_button);
 	input.focus();
 }
 
@@ -105,6 +115,7 @@ transtable.edit_index = function(td_id){
 /**
  * Cancels editing translation
  */
+/*
 transtable.cancel_edit_translation = function(translation_id, translation){
 	
 	if(translation)
@@ -117,26 +128,31 @@ transtable.cancel_edit_translation = function(translation_id, translation){
 	delete transtable.cancel_content[translation_id];
 	
 }
+*/
 
 
 /**
  * Cancels editing index
  */
-transtable.cancel_edit_index = function(td_id, index){
+transtable.cancel_edit_index = function(translation_id, new_index){
 	
-	if(index)
-		transtable.cancel_index[td_id] = index;
+	var input = $('#transtable_index' + translation_id);
 	
-	$('#' + td_id).html(transtable.cancel_index[td_id]);
-	delete transtable.cancel_index[td_id];
+	if(new_index)
+		input.val(new_index);
 	
+	$('#transtable_index_div' + translation_id).html(input.val());
 }
 
 
 /**
  * Saves translation
  */
-transtable.save_translation = function(translation_id){
+transtable.save_translation = function(edit_div_id){
+	
+	var edit_div = $('#' + edit_div_id);
+	var cell = edit_div.parent();
+	var translation_id = transtable.get_translation_id(edit_div_id);
 	
 	var column = cell[0].cellIndex;
 	//var row = cell[0].parentNode.rowIndex;
@@ -145,19 +161,19 @@ transtable.save_translation = function(translation_id){
 	var index = $.trim($('#transtable_trans_index' + translation_id).html());
 	
 	// if ck editor is enabled
-	if(CKEDITOR.instances['transtable_translation' + translation_id]){
-		var translation = $.trim(CKEDITOR.instances['transtable_translation' + translation_id].getData());
+	if(CKEDITOR.instances[edit_div_id]){
+		var translation = $.trim(CKEDITOR.instances[edit_div_id].getData());
 	}
 	else
-		translation = $.trim($('transtable_translation' + translation_id).html());
+		translation = $.trim(edit_div.html());
 	
 	$.ajax({
 		type: 'POST',
 		url: '?transtable_action=savetranslation',
 		data: {file_name:file_name, index:index, translation:translation},
-		success: function(e){
-			transtable.cancel_edit_translation(translation_id, translation);
-		}
+		//success: function(e){
+		//	transtable.cancel_edit_translation(translation_id, translation);
+		//}
 	});
 }
 
@@ -165,21 +181,23 @@ transtable.save_translation = function(translation_id){
 /**
  * Renames index
  */
-transtable.rename_index = function(td_id){
+transtable.rename_index = function(translation_id){
 	
-	var cell = $('#' + td_id);
+	var old_index = $('#transtable_index' + translation_id).val();
+	var new_index = $('#transtable_index_input' + translation_id).val();
 	
-	var old_index = transtable.cancel_index[td_id];
-	var new_index = $.trim($('#' + td_id + 'edit').val());
-	
-	$.ajax({
-		type: 'POST',
-		url: '?transtable_action=saveindex',
-		data: {old_index:old_index, new_index:new_index, folder:$('#transtable_open_folder').val()},
-		success: function(e){
-			transtable.cancel_edit_index(td_id, new_index);
-		}
-	});
+	if(old_index != new_index){
+		$.ajax({
+			type: 'POST',
+			url: '?transtable_action=saveindex',
+			data: {old_index:old_index, new_index:new_index, folder:$('#transtable_open_folder').val()},
+			success: function(e){
+				transtable.cancel_edit_index(translation_id, new_index);
+			}
+		});
+	}
+	else
+		transtable.cancel_edit_index(translation_id);
 }
 
 
@@ -207,15 +225,38 @@ transtable.delete_index = function(translation_id){
 /**
  * Renames add index
  */
+transtable.get_translation_id = function(element_in_row){
+	return $(element_in_row).closest('tr').attr('data-transtable-translation-id');
+}
+
+
+
+/**
+ * Renames add index
+ */
 transtable.add_index = function(){
 	
-	var template = $('#transtable_new_template').html();
+	// last table row
+	var last_row = $('#transtable_table tr').last();
+	var template = last_row.html();
+	var old_translation_id = last_row.attr('data-transtable-translation-id');
+	var new_translation_id = Math.random().toString(36).substring(2, 12);
 	
-	var id = Math.random().toString(36).substring(2, 12);
+	var patt = new RegExp(old_translation_id, 'g');
 	
-	template = '<tr>' + template.replace(/##ID##/gi, id) + '</tr>';
+	template = 
+		'<tr id="transtable_row' + new_translation_id + '" data-transtable-translation-id="' + new_translation_id + '">' + 
+		template.replace(patt, new_translation_id) + 
+		'</tr>';
 	
-	$('#transtable_new_template').before(template);
+	// insert row after last row
+	last_row.after(template);
+	
+	// clean old values
+	$('#transtable_index_div' + new_translation_id).html(new_translation_id);
+	$('#transtable_index' + new_translation_id).val(new_translation_id);
+	$('#transtable_index_div' + new_translation_id).html(new_translation_id);
+	$('#transtable_row' + new_translation_id + ' .transtable_edit_div').html('');
 }
 
 
