@@ -246,8 +246,12 @@ class transtable{
 		// include the file
 		include $file_path_clean;
 	
+		print_r(${$this->config['var_name']});
+		
 		// set new value
 		eval('${$this->config[\'var_name\']}' . $this->get_php_index($index) . ' = $translation;');
+		
+		print_r(${$this->config['var_name']});
 		
 		// save file
 		$this->write_translation_file($file_path_clean, $t);
@@ -501,14 +505,14 @@ class transtable_exception extends Exception{}
  * Writes php code of translation files.
  * Used to write php translation files.
  */
-function echo_translation_array($translations, $var_name, $arr_level = ''){
+function transtable_echo_translation_array($translations, $var_name, $arr_level = ''){
 
 	foreach ($translations as $index => $translation){
 
 		$arr_level1 = $arr_level . "['" . $index . "']";
 
 		if(is_array($translation)){
-			echo_translation_array($translation, $var_name, $arr_level1);
+			transtable_echo_translation_array($translation, $var_name, $arr_level1);
 		}
 		else
 			echo '$' . $var_name . $arr_level1 . " = '" . addslashes($translation) . "';\n";
@@ -516,3 +520,10 @@ function echo_translation_array($translations, $var_name, $arr_level = ''){
 
 }
 
+
+/**
+ * Removes extension from file name.
+ */
+function transtable_strip_extension($file_name){
+	return substr($file_name, 0, strrpos($file_name, '.'));
+}

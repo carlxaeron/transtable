@@ -1,11 +1,19 @@
 <!-- navigation (all folders with translations) -->
-
 <?php 
 if(count($data) > 1 )
 foreach ($data as $_tab_name => $_null){ 
 ?>
 <a class="transtable_btt transtable_btt_white transtable_btt_rounded transtable_btt_small" href="?transtable_folder=<?php echo urlencode($_tab_name) ?>"><?php echo htmlspecialchars($_tab_name); ?></a>
 <?php } ?>
+
+
+<!-- column chooser -->
+<?php 
+foreach ($data[$folder]['translations'] as $_file_name => $_translations){  
+?>
+<?php echo transtable_strip_extension($_file_name) ?>
+<?php } ?>
+
 
 <!-- table with translations -->
 <table border="0" cellpadding="2" cellspacing="5" id="transtable_table">
@@ -17,8 +25,8 @@ foreach ($data as $_tab_name => $_null){
 	?>
 	
 	
-	<!-- first row with file names -->
 	<?php if($_row_index == 0){ ?>
+	<!-- first row with file names -->
 	<tr>
 		<?php if($enable_delete_translation){ ?>
 		<th>&nbsp;</th>
@@ -26,11 +34,15 @@ foreach ($data as $_tab_name => $_null){
 
 		<th class="transtable_header_cell">index</th>
 		<?php 
-		$_column_index = 1;
+		if($enable_delete_translation)
+			$_column_index = 2;
+		else
+			$_column_index = 1;
+			
 		foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
 		?>
 		<th class="transtable_header_cell">
-			<?php echo substr($_file_name, 0, strrpos($_file_name, '.')); ?>
+			<?php echo transtable_strip_extension($_file_name); ?>
 			<input id="transtable_file_name<?php echo $_column_index ?>" type="hidden" value="<?php echo htmlspecialchars($_file_name) ?>" />
 		</th>
 		<?php
@@ -43,7 +55,7 @@ foreach ($data as $_tab_name => $_null){
 	} 
 	?>
 	
-	<!-- rows with translations -->
+	<!-- translation row -->
 	<?php 
 		$_translation_id = 't' . md5($_file_name . rand() . microtime());
 	?>
@@ -63,7 +75,7 @@ foreach ($data as $_tab_name => $_null){
 		foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
 		?>
 		<td class="transtable_translation_cell">
-			<div contenteditable="true" class="transtable_edit_div">
+			<div contenteditable="true" class="transtable_edit_div" id="transtable_translation<?php echo $_translation_id . md5($_file_name) ?>">
 				<?php @eval('echo ($_translations' . $translate->get_php_index($_index) . ');'); ?>
 			</div>
 		</td>
@@ -80,7 +92,12 @@ foreach ($data as $_tab_name => $_null){
 <?php } ?>
 
 <div class="transtable_help">
-Double click on translation to edit.
+	<ul>
+		<li>Click on translation to edit.</li>
+		<?php if($enable_edit_index){ ?>
+		<li>Double click on index to edit.</li>
+		<?php } ?>
+	</ul>
 </div>
 
 <input id="transtable_open_folder" type="hidden" value="<?php echo htmlspecialchars($folder) ?>" />
