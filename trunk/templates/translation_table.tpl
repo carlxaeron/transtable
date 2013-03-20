@@ -19,13 +19,19 @@
 <!-- column chooser -->
 <?php if(count($data[$folder]['translations']) > 1 ){ ?>
 <div id="transtable_show_files">
+	<span>
+		<label>
+			<input type="checkbox" checked="checked" id="transtable_showindexrow" data-transtable-column-index="<?php echo $_column_start_index ?>"/>
+			index
+		</label>
+	</span>
 <?php 
 $_column_index = $_column_start_index+1;
 foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
 ?>
 	<span>
 		<label>
-			<input type="checkbox" checked="checked" data-transtable-column-index="<?php echo $_column_index ?>"/>
+			<input type="checkbox" checked="checked" id="transtable_<?php echo md5($_file_name); ?>" data-transtable-column-index="<?php echo $_column_index ?>"/>
 			<?php echo transtable_strip_extension($_file_name) ?>
 		</label>
 	</span>
@@ -93,7 +99,7 @@ foreach ($data[$folder]['translations'] as $_file_name => $_translations){
 		<?php 
 		foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
 		?>
-		<td class="transtable_translation_cell">
+		<td valign="top" class="transtable_translation_cell">
 			<div contenteditable="true" class="transtable_edit_div" id="transtable_translation<?php echo $_translation_id . md5($_file_name) ?>">
 				<?php @eval('echo ($_translations' . $translate->get_php_index($_index) . ');'); ?>
 			</div>
@@ -122,4 +128,6 @@ foreach ($data[$folder]['translations'] as $_file_name => $_translations){
 <input id="transtable_open_folder" type="hidden" value="<?php echo htmlspecialchars($folder) ?>" />
 <input id="transtable_enable_html_editor" type="hidden" value="<?php echo $enable_html_editor?1:0 ?>" />
 <input id="transtable_enable_delete_translation" type="hidden" value="<?php echo $enable_delete_translation?1:0 ?>" />
+<input id="transtable_enable_edit_index" type="hidden" value="<?php echo $enable_edit_index?1:0 ?>" />
+<input id="transtable_enable_add_translation" type="hidden" value="<?php echo $enable_add_translation?1:0 ?>" />
 

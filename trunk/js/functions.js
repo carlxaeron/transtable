@@ -67,21 +67,27 @@ CKEDITOR.disableAutoInline = true;
  */
 transtable.init_table = function(){
 	$('#transtable_table').on('click', '.transtable_edit_div', function(e){
-		transtable.edit_translation($(e.target).attr('id'));
+		transtable.edit_translation($(e.currentTarget).attr('id'));
 	});
 	
-	$('#transtable_table').on('dblclick', '.transtable_index_cell', function(e){		
-		transtable.edit_index(e.currentTarget);
-	});
+	if($('#transtable_enable_edit_index').val() == '1'){
+		$('#transtable_table').on('dblclick', '.transtable_index_cell', function(e){		
+			transtable.edit_index(e.currentTarget);
+		});
+	}
 	
-	$('#transtable_add_index').on('click', function(e){		
-		transtable.add_index();
-	});
+	if($('#transtable_enable_add_translation').val() == '1'){
+		$('#transtable_add_index').on('click', function(e){		
+			transtable.add_index();
+		});
+	}
 	
-	$('#transtable_table').on('click', '.transtable_del_link', function(e){		
-		e.preventDefault();
-		transtable.delete_index(transtable.get_translation_id(e.target));
-	});
+	if($('#transtable_enable_delete_translation').val() == '1'){
+		$('#transtable_table').on('click', '.transtable_del_link', function(e){		
+			e.preventDefault();
+			transtable.delete_index(transtable.get_translation_id(e.target));
+		});
+	}
 	
 	$('#transtable_show_files input').on('click', function(e){	
 		transtable.show_hide_column($(e.target).attr('data-transtable-column-index'));
@@ -319,13 +325,15 @@ transtable.show_hide_column = function(column_nubmer, on_off){
  */
 transtable.show_hide_save = function(){
 	
-	var data = [];
+	if(!localStorage['transtable_columns_state'])
+		var data = {};
+	else
+		data = JSON.parse(localStorage['transtable_columns_state']);
 
 	$('#transtable_show_files input').each(function(){
-		data[data.length] = $(this).prop('checked') ? 1 : 0;
+		var checked = $(this).prop('checked') ? 1 : 0;
+		data[$(this).attr('id')] = checked;
 	});
-
-	console.log(data);
 	
 	localStorage['transtable_columns_state'] = JSON.stringify(data);
 }
@@ -341,23 +349,27 @@ transtable.show_hide_load = function(){
 
 	var data = JSON.parse(localStorage['transtable_columns_state']);
 
+	if(!data)
+		return;
+	
+	// number of columns
 	if($('#transtable_enable_delete_translation').length)
 		var column_number_start = 3;
 	else
 		var column_number_start = 2;
-
 	
-	for(var i=0; i<data.length; i++){
-		var col = i+column_number_start;
-		var chkbox = $('[data-transtable-column-index="' + col + '"]');
+	$('#transtable_show_files input').each(function(){
+		var chkbox = $(this);
+		var id = chkbox.attr('id');
 		
-		transtable.show_hide_column(col, data[i]);
-		
-		if(data[i]) // is checked
-			chkbox.prop('checked', true);
-		else
-			chkbox.prop('checked', false);
-		
-	}
+		if(typeof data[id] != 'undefined'){
+			if(data[id] == 1)
+				chkbox.prop('checked', true);
+			else if(data[id] == 0){
+				chkbox.prop('checked', false);
+				transtable.show_hide_column(chkbox.attr('data-transtable-column-index'), 0);
+			}
+		}
+	});
 }
 
