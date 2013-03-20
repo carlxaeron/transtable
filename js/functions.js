@@ -1,3 +1,17 @@
+$(document).ready(function () {
+	
+	transtable.init_table();
+	
+	transtable.show_hide_load();
+	
+	$('body').ajaxError(function(event, request, settings){
+		if(request.responseText)
+			alert(request.responseText);
+		else
+			alert("Error requesting page: " + settings.url);
+	})
+});
+
 
 /**
  * transtable object - namespace.
@@ -68,6 +82,10 @@ transtable.init_table = function(){
 		e.preventDefault();
 		transtable.delete_index(transtable.get_translation_id(e.target));
 	});
+	
+	$('#transtable_show_files input').on('click', function(e){	
+		transtable.show_hide_column($(e.target).attr('data-transtable-column-index'));
+	});
 }
 
 
@@ -85,7 +103,7 @@ transtable.edit_translation = function(edit_div_id){
 	}
 	// txt editor
 	else{
-		
+		// TODO
 	}
 }
 
@@ -269,5 +287,77 @@ transtable.add_index = function(){
 	
 	// show new row
 	$('#transtable_row' + new_translation_id).show('slow');
+}
+
+
+/**
+ * Shows or hides table column
+ */
+transtable.show_hide_column = function(column_nubmer, on_off){
+	
+	var column = $('#transtable_table td:nth-child(' + column_nubmer + '), #transtable_table th:nth-child(' + column_nubmer + ')');
+	
+	if(typeof on_off === 'undefined'){
+		if(column.first().is(':visible'))
+			column.hide();
+		else
+			column.show();
+	}
+	else{
+		if(!on_off)
+			column.hide();
+		else
+			column.show();
+	}
+	
+	transtable.show_hide_save();
+}
+
+
+/**
+ * Saves hidden/visible columns
+ */
+transtable.show_hide_save = function(){
+	
+	var data = [];
+
+	$('#transtable_show_files input').each(function(){
+		data[data.length] = $(this).prop('checked') ? 1 : 0;
+	});
+
+	console.log(data);
+	
+	localStorage['transtable_columns_state'] = JSON.stringify(data);
+}
+
+
+/**
+ * Loads hidden/visible state of columns
+ */
+transtable.show_hide_load = function(){
+	
+	if(!localStorage['transtable_columns_state'])
+		return;
+
+	var data = JSON.parse(localStorage['transtable_columns_state']);
+
+	if($('#transtable_enable_delete_translation').length)
+		var column_number_start = 3;
+	else
+		var column_number_start = 2;
+
+	
+	for(var i=0; i<data.length; i++){
+		var col = i+column_number_start;
+		var chkbox = $('[data-transtable-column-index="' + col + '"]');
+		
+		transtable.show_hide_column(col, data[i]);
+		
+		if(data[i]) // is checked
+			chkbox.prop('checked', true);
+		else
+			chkbox.prop('checked', false);
+		
+	}
 }
 
