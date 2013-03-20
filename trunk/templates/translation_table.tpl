@@ -1,3 +1,11 @@
+<!-- no translations -->
+<?php if(isset($no_translations)){ ?>
+Cannot find any translations. Please check path to translation files in config.php.
+<?php 
+return;
+} 
+?>
+
 <!-- navigation (all folders with translations) -->
 <?php if(count($data) > 1 ){ ?>
 <div id="transtable_folders">
