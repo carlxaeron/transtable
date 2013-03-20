@@ -1,7 +1,8 @@
 body{
 	background-color: #666;
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 10pt;	
+	font-size: 10pt;
+	margin: 5px;
 }
 
 a{
@@ -129,6 +130,21 @@ from: http://webdesignerwall.com/tutorials/css3-gradient-buttons */
 	border-radius: 2em;
 }
 
+#transtable_folders {
+	margin-bottom: 10px;
+}
+
+#transtable_show_files {
+	margin-bottom: 15px;
+	font-size: 10pt;
+	color: #FFF;
+}
+
+#transtable_show_files span {
+	margin-right: 15px;
+	white-space: nowrap;
+}
+
 .transtable_btt_orange {
 	color: #fef4e9;
 	border: solid 1px #da7c0c;
@@ -171,4 +187,24 @@ from: http://webdesignerwall.com/tutorials/css3-gradient-buttons */
 	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#ffffff');
 }
 
+.transtable_btt_blue {
+	color: #d9eef7;
+	border: solid 1px #0076a3;
+	background: #0095cd;
+	background: -webkit-gradient(linear, left top, left bottom, from(#00adee), to(#0078a5));
+	background: -moz-linear-gradient(top,  #00adee,  #0078a5);
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#00adee', endColorstr='#0078a5');
+}
+.transtable_btt_blue:hover {
+	background: #007ead;
+	background: -webkit-gradient(linear, left top, left bottom, from(#0095cc), to(#00678e));
+	background: -moz-linear-gradient(top,  #0095cc,  #00678e);
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0095cc', endColorstr='#00678e');
+}
+.transtable_btt_blue:active {
+	color: #80bed6;
+	background: -webkit-gradient(linear, left top, left bottom, from(#0078a5), to(#00adee));
+	background: -moz-linear-gradient(top,  #0078a5,  #00adee);
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0078a5', endColorstr='#00adee');
+}
 

@@ -1,18 +1,41 @@
 <!-- navigation (all folders with translations) -->
-<?php 
-if(count($data) > 1 )
-foreach ($data as $_tab_name => $_null){ 
-?>
-<a class="transtable_btt transtable_btt_white transtable_btt_rounded transtable_btt_small" href="?transtable_folder=<?php echo urlencode($_tab_name) ?>"><?php echo htmlspecialchars($_tab_name); ?></a>
+<?php if(count($data) > 1 ){ ?>
+<div id="transtable_folders">
+	<?php foreach ($data as $_tab_name => $_null){ ?>
+	<a class="transtable_btt <?php if($folder == $_tab_name){ ?>transtable_btt_blue<?php }else{ ?>transtable_btt_white<?php } ?> transtable_btt_rounded transtable_btt_small" href="<?php if($folder == $_tab_name){ ?>#<?php }else{ ?>?transtable_folder=<?php echo urlencode($_tab_name) ?><?php } ?>"><?php echo htmlspecialchars($_tab_name); ?></a>
+	<?php } ?>
+</div>
 <?php } ?>
+
+
+<?php 
+	if($enable_delete_translation)
+		$_column_start_index = 2;
+	else
+		$_column_start_index = 1;
+?>
 
 
 <!-- column chooser -->
+<?php if(count($data[$folder]['translations']) > 1 ){ ?>
+<div id="transtable_show_files">
 <?php 
-foreach ($data[$folder]['translations'] as $_file_name => $_translations){  
+$_column_index = $_column_start_index+1;
+foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
 ?>
-<?php echo transtable_strip_extension($_file_name) ?>
+	<span>
+		<label>
+			<input type="checkbox" checked="checked" data-transtable-column-index="<?php echo $_column_index ?>"/>
+			<?php echo transtable_strip_extension($_file_name) ?>
+		</label>
+	</span>
+<?php 
+	$_column_index++;
+}
+?>
+</div>
 <?php } ?>
+
 
 
 <!-- table with translations -->
@@ -34,11 +57,7 @@ foreach ($data[$folder]['translations'] as $_file_name => $_translations){
 
 		<th class="transtable_header_cell">index</th>
 		<?php 
-		if($enable_delete_translation)
-			$_column_index = 2;
-		else
-			$_column_index = 1;
-			
+		$_column_index = $_column_start_index;
 		foreach ($data[$folder]['translations'] as $_file_name => $_translations){ 
 		?>
 		<th class="transtable_header_cell">
@@ -102,10 +121,5 @@ foreach ($data[$folder]['translations'] as $_file_name => $_translations){
 
 <input id="transtable_open_folder" type="hidden" value="<?php echo htmlspecialchars($folder) ?>" />
 <input id="transtable_enable_html_editor" type="hidden" value="<?php echo $enable_html_editor?1:0 ?>" />
-
-<script type="text/javascript">
-	$(document).ready(function () {
-		transtable.init_table();
-	});
-</script>
+<input id="transtable_enable_delete_translation" type="hidden" value="<?php echo $enable_delete_translation?1:0 ?>" />
 
