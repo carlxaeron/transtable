@@ -156,6 +156,10 @@ class transtable{
 		foreach ($return as $folder => $data) {
 			// if there are any translations
 			if($return[$folder]['translations']){
+				
+				// sort translations by file name
+				ksort ($return[$folder]['translations']);
+				
 				// for each file
 				foreach ($return[$folder]['translations'] as $file_name => $translations) {
 					// for each translation in file
