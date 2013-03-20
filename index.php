@@ -29,20 +29,20 @@ if($action == 'index'){
 		$folder = '/';
 	
 	$translations = $transtable->get_all_translations($folder);
-	
-	// print_r($translations);
-	
 	$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
 	
-	$dully->assign('translate', $transtable);
-	$dully->assign('data', $translations);
-	$dully->assign('folder', $folder);
-	$dully->assign('page_title', $TTCFG['php_array_files']['page_title']);
-	$dully->assign('enable_html_editor', $TTCFG['php_array_files']['enable_html_editor']);
-	$dully->assign('enable_edit_index', $TTCFG['php_array_files']['enable_edit_index']);
-	$dully->assign('enable_delete_translation', $TTCFG['php_array_files']['enable_delete_translation']);
-	$dully->assign('enable_add_translation', $TTCFG['php_array_files']['enable_add_translation']);
-	
+	if($translations){
+		$dully->assign('translate', $transtable);
+		$dully->assign('data', $translations);
+		$dully->assign('folder', $folder);
+		$dully->assign('page_title', $TTCFG['php_array_files']['page_title']);
+		$dully->assign('enable_html_editor', $TTCFG['php_array_files']['enable_html_editor']);
+		$dully->assign('enable_edit_index', $TTCFG['php_array_files']['enable_edit_index']);
+		$dully->assign('enable_delete_translation', $TTCFG['php_array_files']['enable_delete_translation']);
+		$dully->assign('enable_add_translation', $TTCFG['php_array_files']['enable_add_translation']);
+	}
+	else
+		$dully->assign('no_translations', 1);
 	$dully->assign('page_content', $dully->fetch('translation_table.tpl'));
 	
 	// display template
@@ -104,6 +104,8 @@ class transtable{
 	 */
 	public function get_all_translations($for_folder = null){
 		
+		$return = array();
+		
 		// file name pattern
 		$file_name_pattern = '/^' . $this->config['file_name_pattern'] . '$/';
 		
@@ -147,36 +149,38 @@ class transtable{
 		}
 		
 		
-		// array that holds all indexes from all translation arrays (from each file in folder)
-		$return[$folder]['all_indexes'] = array();
-		
-		
-		// find all indexes form each translation array
-		// for each folder
-		foreach ($return as $folder => $data) {
-			// if there are any translations
-			if($return[$folder]['translations']){
-				
-				// sort translations by file name
-				ksort ($return[$folder]['translations']);
-				
-				// for each file
-				foreach ($return[$folder]['translations'] as $file_name => $translations) {
-					// for each translation in file
-					foreach ($translations as $index => $translation) {
-						
-						if(is_array($translation)){
+		if($return){
+			// find all indexes form each translation array
+			// for each folder
+			foreach ($return as $folder => $data) {
+				// if there are any translations
+				if($return[$folder]['translations']){
+					
+					// sort translations by file name
+					ksort ($return[$folder]['translations']);
+					
+					// array that holds all indexes from all translation arrays (from each file in folder)
+					$return[$folder]['all_indexes'] = array();
+					
+					// for each file
+					foreach ($return[$folder]['translations'] as $file_name => $translations) {
+						// for each translation in file
+						foreach ($translations as $index => $translation) {
 							
-							foreach ($this->get_text_indexes($translation, $index) as $subindexes_text)
-								$return[$folder]['all_indexes'][$subindexes_text] = null;
-						}
-						else{
-							$return[$folder]['all_indexes'][$index] = null;
+							if(is_array($translation)){
+								
+								foreach ($this->get_text_indexes($translation, $index) as $subindexes_text)
+									$return[$folder]['all_indexes'][$subindexes_text] = null;
+							}
+							else{
+								$return[$folder]['all_indexes'][$index] = null;
+							}
 						}
 					}
 				}
 			}
 		}
+		
 		
 		return $return;
 	}
@@ -519,9 +523,17 @@ function transtable_echo_translation_array($translations, $var_name, $arr_level 
 			transtable_echo_translation_array($translation, $var_name, $arr_level1);
 		}
 		else
-			echo '$' . $var_name . $arr_level1 . " = '" . addslashes($translation) . "';\n";
+			echo '$' . $var_name . $arr_level1 . " = '" . transtable_addslashes($translation) . "';\n";
 	}
 
+}
+
+
+/**
+ * Adds slashes
+ */
+function transtable_addslashes($translation){
+	return str_replace("'", '\\\'', $translation);
 }
 
 
