@@ -1,7 +1,7 @@
 <?php
 
 // folder with translation files
-$TTCFG['php_array_files']['root_dir'] = 'W:/WEBROOT/transtable/translations'; // without / at the end
+$TTCFG['php_array_files']['root_dir'] = '/somefolder/translations'; // without / at the end
 
 // translation file name pattern
 $TTCFG['php_array_files']['file_name_pattern'] = '..\.php';
@@ -29,3 +29,10 @@ $TTCFG['php_array_files']['enable_add_translation'] = 1;
 
 // generated translation file newlines
 $TTCFG['php_array_files']['new_lines'] = PHP_EOL;
+
+/**
+ * Config file that will override settings in this file.
+ */
+$config_override_path = dirname(__FILE__) . '/config_override.php';
+if(file_exists($config_override_path))
+	include_once $config_override_path;
