@@ -265,13 +265,9 @@ class transtable{
 		
 		// include the file
 		include $file_path_clean;
-	
-		print_r(${$this->config['var_name']});
 		
 		// set new value
 		eval('${$this->config[\'var_name\']}' . $this->get_php_index($index) . ' = $translation;');
-		
-		print_r(${$this->config['var_name']});
 		
 		// save file
 		$this->write_translation_file($file_path_clean, $t);
