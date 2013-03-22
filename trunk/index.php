@@ -16,55 +16,64 @@ else
 /**
  * Controller part
  */
-
-// main page
-if($action == 'index'){
-	
-	$transtable = new transtable();
-	
-	// get all translations from folder
-	if(isset($_GET['transtable_folder']) && $_GET['transtable_folder'])
-		$folder = $_GET['transtable_folder'];
-	else
-		$folder = '/';
-	
-	$translations = $transtable->get_all_translations($folder);
-	$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
-	
-	if($translations){
-		$dully->assign('translate', $transtable);
-		$dully->assign('data', $translations);
-		$dully->assign('folder', $folder);
-		$dully->assign('page_title', $TTCFG['php_array_files']['page_title']);
-		$dully->assign('enable_html_editor', $TTCFG['php_array_files']['enable_html_editor']);
-		$dully->assign('enable_edit_index', $TTCFG['php_array_files']['enable_edit_index']);
-		$dully->assign('enable_delete_translation', $TTCFG['php_array_files']['enable_delete_translation']);
-		$dully->assign('enable_add_translation', $TTCFG['php_array_files']['enable_add_translation']);
+try{
+	// main page
+	if($action == 'index'){
+		
+		$transtable = new transtable();
+		
+		// get all translations from folder
+		if(isset($_GET['transtable_folder']) && $_GET['transtable_folder'])
+			$folder = $_GET['transtable_folder'];
+		else
+			$folder = '/';
+		
+		$translations = $transtable->get_all_translations($folder);
+		$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
+		
+		if($translations){
+			$dully->assign('translate', $transtable);
+			$dully->assign('data', $translations);
+			$dully->assign('folder', $folder);
+			$dully->assign('page_title', $TTCFG['php_array_files']['page_title']);
+			$dully->assign('enable_html_editor', $TTCFG['php_array_files']['enable_html_editor']);
+			$dully->assign('enable_edit_index', $TTCFG['php_array_files']['enable_edit_index']);
+			$dully->assign('enable_delete_translation', $TTCFG['php_array_files']['enable_delete_translation']);
+			$dully->assign('enable_add_translation', $TTCFG['php_array_files']['enable_add_translation']);
+		}
+		else
+			$dully->assign('no_translations', 1);
+		$dully->assign('page_content', $dully->fetch('translation_table.tpl'));
+		
+		// display template
+		echo $dully->fetch('main.tpl');
 	}
-	else
-		$dully->assign('no_translations', 1);
-	$dully->assign('page_content', $dully->fetch('translation_table.tpl'));
 	
-	// display template
-	echo $dully->fetch('main.tpl');
+	// save translation
+	else if($action == 'savetranslation'){
+		$transtable = new transtable();
+		echo $transtable->save_translation($_POST['file_name'], $_POST['index'], $_POST['translation']);
+	}
+	
+	// save index
+	else if($action == 'saveindex'){
+		$transtable = new transtable();
+		echo $transtable->rename_index($_POST['old_index'], $_POST['new_index'], $_POST['folder']);
+	}
+	
+	// delete index (row)
+	else if($action == 'deleteindex'){
+		$transtable = new transtable();
+		echo $transtable->delete_index($_POST['index'], $_POST['folder']);
+	}
 }
-
-// save translation
-else if($action == 'savetranslation'){
-	$transtable = new transtable();
-	echo $transtable->save_translation($_POST['file_name'], $_POST['index'], $_POST['translation']);
-}
-
-// save index
-else if($action == 'saveindex'){
-	$transtable = new transtable();
-	echo $transtable->rename_index($_POST['old_index'], $_POST['new_index'], $_POST['folder']);
-}
-
-// delete index (row)
-else if($action == 'deleteindex'){
-	$transtable = new transtable();
-	echo $transtable->delete_index($_POST['index'], $_POST['folder']);
+catch(Exception $e){
+	
+	// send 500 header
+	if(!headers_sent())
+		header('HTTP/1.1 500 Exception');
+	
+	echo $e->getMessage();
 }
 
 
@@ -96,6 +105,10 @@ class transtable{
 			global $TTCFG;
 			$this->config = $TTCFG['php_array_files'];
 		}
+
+		$this->config['root_dir'] = realpath($this->config['root_dir']);
+		//if(stripos($this->config['root_dir'], '\\') !== false)
+		//	$this->config['root_dir'] = str_replace('\\', '/', $this->config['root_dir']);
 	}
 	
 	
@@ -109,17 +122,14 @@ class transtable{
 		// file name pattern
 		$file_name_pattern = '/^' . $this->config['file_name_pattern'] . '$/';
 		
+		// include foles from this folder
 		if($for_folder)
 			$for_folder = $this->check_path($for_folder);
 		
-		$di = new RecursiveDirectoryIterator($this->config['root_dir']);
+		$root_path_len = strlen($this->config['root_dir']);
 		
-		$i = 0; $root_path_len = 0;
+		$di = new RecursiveDirectoryIterator($this->config['root_dir']);
 		foreach (new RecursiveIteratorIterator($di) as $path => $file) {
-			
-			if($i == 0)
-				$root_path_len = strlen($path);
-			$i++;
 			
 			// file name
 			$file_name = $file->getFilename();
@@ -129,8 +139,7 @@ class transtable{
 				continue;
 				
 			// folder relative path
-			$folder = '/' . substr_replace(dirname($path), '', 0, $root_path_len-1);
-			
+			$folder = '/' . substr_replace(dirname($path), '', 0, $root_path_len+1);
 			
 			if(!$for_folder or $for_folder == $folder){
 				
@@ -304,7 +313,7 @@ class transtable{
 	 * @return string
 	 */
 	protected function check_path($file_path_relative, $return_absolute_path = 0){
-	
+		
 		// full path to file
 		$file_path_clean = realpath($this->config['root_dir'] . '/' . $file_path_relative);
 	
@@ -312,9 +321,8 @@ class transtable{
 			throw new transtable_exception("File {$this->config['root_dir']}/$file_path_relative doesn't exists");
 	
 		// check if file is subdir
-		$root_dir = realpath($this->config['root_dir']);
-		if(strcmp(substr($file_path_clean, 0, strlen($root_dir)), $root_dir) !== 0)
-			throw new transtable_exception("File $file_path_clean is not in subdirecory of $root_dir");
+		if(strcmp(substr($file_path_clean, 0, strlen($this->config['root_dir'])), $this->config['root_dir']) !== 0)
+			throw new transtable_exception("File $file_path_clean is not in subdirecory of {$this->config['root_dir']}");
 		
 		if($return_absolute_path)
 			return $file_path_clean;
