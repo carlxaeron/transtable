@@ -309,7 +309,7 @@ class transtable{
 		$file_path_clean = realpath($this->config['root_dir'] . '/' . $file_path_relative);
 	
 		if(!$file_path_clean)
-			throw new transtable_exception("File $file_path_relative doesn't exists");
+			throw new transtable_exception("File {$this->config['root_dir']}/$file_path_relative doesn't exists");
 	
 		// check if file is subdir
 		$root_dir = realpath($this->config['root_dir']);
