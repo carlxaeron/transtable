@@ -159,6 +159,10 @@ class transtable{
 		
 		
 		if($return){
+			
+			// sort translations by folder name
+			ksort ($return);
+			
 			// find all indexes form each translation array
 			// for each folder
 			foreach ($return as $folder => $data) {
@@ -189,7 +193,6 @@ class transtable{
 				}
 			}
 		}
-		
 		
 		return $return;
 	}
