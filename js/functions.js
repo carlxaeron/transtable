@@ -200,7 +200,7 @@ transtable.save_translation = function(edit_div_id){
 	$.ajax({
 		type: 'POST',
 		url: '?transtable_action=savetranslation',
-		data: {file_name:file_name, index:index, translation:translation},
+		data: {file_name:file_name, index:index, translation:translation, folder:$('#transtable_open_folder').val()},
 		//success: function(e){
 		//	transtable.cancel_edit_translation(translation_id, translation);
 		//}
