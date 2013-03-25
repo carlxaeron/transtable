@@ -52,7 +52,7 @@ try{
 	// save translation
 	else if($action == 'savetranslation'){
 		$transtable = new transtable();
-		echo $transtable->save_translation($_POST['file_name'], $_POST['index'], $_POST['translation']);
+		echo $transtable->save_translation($_POST['file_name'], $_POST['folder'], $_POST['index'], $_POST['translation']);
 	}
 	
 	// save index
@@ -256,8 +256,10 @@ class transtable{
 	 * @param string $translation translation value
 	 * @throws transtable_exception
 	 */
-	public function save_translation($file_path_relative, $index, $translation){
+	public function save_translation($file_name, $folder, $index, $translation){
 	
+		$file_path_relative = $folder . '/' . $file_name;
+		
 		// full path to file
 		$file_path_clean = $this->check_path($file_path_relative, 'return_absolute_path');
 		
