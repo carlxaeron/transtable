@@ -38,6 +38,7 @@ transtable.CKeditor_config = {
 			['Cut','Copy','Paste','PasteText','PasteFromWord'],
 			['Undo','Redo','-','SelectAll','RemoveFormat'],
 			['Link','Unlink'],
+			['Format'],
 			'/',
 			['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
 			['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
@@ -47,6 +48,7 @@ transtable.CKeditor_config = {
 	enterMode : CKEDITOR.ENTER_BR,
 	shiftEnterMode: CKEDITOR.ENTER_P,
 	disableAutoInline: true,
+	format_tags : 'h1;h2;h3;h4',
 	on: {
 		blur: function(event) {
 			transtable.save_translation($(event.editor.element.$).attr('id'));
