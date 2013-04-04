@@ -40,6 +40,7 @@ try{
 			$dully->assign('enable_edit_index', $TTCFG['php_array_files']['enable_edit_index']);
 			$dully->assign('enable_delete_translation', $TTCFG['php_array_files']['enable_delete_translation']);
 			$dully->assign('enable_add_translation', $TTCFG['php_array_files']['enable_add_translation']);
+			$dully->assign('include_css_files', @$TTCFG['include_css']);
 		}
 		else
 			$dully->assign('no_translations', 1);
