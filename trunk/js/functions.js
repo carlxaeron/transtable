@@ -42,7 +42,7 @@ transtable.CKeditor_config = {
 			['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
 			['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
 			['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-			['Sourcedialog']
+			['Sourcedialog', 'SpecialChar']
 		],
 	enterMode : CKEDITOR.ENTER_BR,
 	shiftEnterMode: CKEDITOR.ENTER_P,
