@@ -5,7 +5,7 @@
 <title><?php echo $page_title; ?></title>
 
 <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="lib/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="lib/ckeditor_401/ckeditor.js"></script>
 <script type="text/javascript" src="js/functions.js"></script>
 <link rel="stylesheet" href="css/styles.css" type="text/css" />
 
