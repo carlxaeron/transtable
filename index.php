@@ -65,6 +65,7 @@ try{
 	else if($action == 'deleteindex'){
 		$transtable = new transtable();
 		echo $transtable->delete_index($_POST['index'], $_POST['folder']);
+		$dully->assign('include_css_files', @$TTCFG['include_css']);
 	}
 }
 catch(Exception $e){

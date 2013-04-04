@@ -30,6 +30,10 @@ $TTCFG['php_array_files']['enable_add_translation'] = 1;
 // generated translation file newlines
 $TTCFG['php_array_files']['new_lines'] = PHP_EOL;
 
+// include css files
+//$TTCFG['include_css'][] = '';
+
+
 /**
  * Config file that will override settings in this file.
  */
