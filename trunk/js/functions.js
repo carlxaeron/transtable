@@ -34,7 +34,6 @@ transtable.CKeditor_config = {
 	toolbar : 'Transtable',
 	toolbar_Transtable :
 		[
-			// ['Source'],
 			['Cut','Copy','Paste','PasteText','PasteFromWord'],
 			['Undo','Redo','-','SelectAll','RemoveFormat'],
 			['Link','Unlink'],
@@ -42,9 +41,9 @@ transtable.CKeditor_config = {
 			'/',
 			['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
 			['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
-			['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock']
+			['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+			['Sourcedialog']
 		],
-	//height : '100px',
 	enterMode : CKEDITOR.ENTER_BR,
 	shiftEnterMode: CKEDITOR.ENTER_P,
 	disableAutoInline: true,
@@ -53,8 +52,9 @@ transtable.CKeditor_config = {
 		blur: function(event) {
 			transtable.save_translation($(event.editor.element.$).attr('id'));
 	        }
-	}
-	
+	},
+	extraPlugins: 'sourcedialog',
+	removePlugins: 'sourcearea'
 };
 
 
