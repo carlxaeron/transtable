@@ -30,7 +30,7 @@ $TTCFG['php_array_files']['enable_add_translation'] = 1;
 // generated translation file newlines
 $TTCFG['php_array_files']['new_lines'] = PHP_EOL;
 
-// include css files
+// CSS files to include.
 //$TTCFG['include_css'][] = '';
 
 
@@ -40,3 +40,4 @@ $TTCFG['php_array_files']['new_lines'] = PHP_EOL;
 $config_override_path = dirname(__FILE__) . '/config_override.php';
 if(file_exists($config_override_path))
 	include_once $config_override_path;
+
