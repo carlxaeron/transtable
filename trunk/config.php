@@ -1,6 +1,9 @@
 <?php
+/**
+ * Configuration.
+ */
 
-// folder with translation files
+// absolute filesystem path to folder with translation files
 $TTCFG['php_array_files']['root_dir'] = '/somefolder/translations'; // without / at the end
 
 // translation file name pattern
@@ -24,7 +27,7 @@ $TTCFG['php_array_files']['enable_edit_index'] = 1;
 // enable deleting translations
 $TTCFG['php_array_files']['enable_delete_translation'] = 1;
 
-// enable deleting translations
+// enable add a new translations
 $TTCFG['php_array_files']['enable_add_translation'] = 1;
 
 // generated translation file newlines
@@ -35,7 +38,7 @@ $TTCFG['php_array_files']['new_lines'] = PHP_EOL;
 
 
 /**
- * Config file that will override settings in this file.
+ * Configuration file that will override settings in this file.
  */
 $config_override_path = dirname(__FILE__) . '/config_override.php';
 if(file_exists($config_override_path))
