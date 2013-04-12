@@ -12,6 +12,9 @@ a{
 a:hover{
 	text-decoration:underline;
 }
+a:visited{
+	text-decoration:none;
+}
 
 /*
 #transtable_table td{
@@ -145,6 +148,18 @@ from: http://webdesignerwall.com/tutorials/css3-gradient-buttons */
 	margin-right: 15px;
 	white-space: nowrap;
 }
+
+#transtable_sign {
+	float: right;
+	padding: 5px;
+	font-style: italic;
+	font-size: 8pt;
+}
+
+#transtable_sign a{
+	color: #CCC;
+}
+
 
 .transtable_btt_orange {
 	color: #fef4e9;
