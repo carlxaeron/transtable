@@ -6,6 +6,10 @@ return;
 } 
 ?>
 
+<div id="transtable_sign">
+	<a href="http://code.google.com/p/transtable/" target="_blank">Transtable v<?php echo $version; ?></a>
+</div>
+
 <!-- navigation (all folders with translations) -->
 <?php if(count($data) > 1 ){ ?>
 <div id="transtable_folders">
@@ -121,14 +125,14 @@ foreach ($data[$folder]['translations'] as $_file_name => $_translations){
 	
 </table>
 <?php if($enable_add_translation){ ?>
-<button class="transtable_btt transtable_btt_orange transtable_btt_medium" type="button" id="transtable_add_index">Add new translation</button>
+<button class="transtable_btt transtable_btt_orange transtable_btt_medium" type="button" id="transtable_add_index">Add a new translation</button>
 <?php } ?>
 
 <div class="transtable_help">
 	<ul>
-		<li>Click on translation to edit.</li>
+		<li>Click on the translation to edit.</li>
 		<?php if($enable_edit_index){ ?>
-		<li>Double click on index to edit.</li>
+		<li>Double click on the index to edit.</li>
 		<?php } ?>
 	</ul>
 </div>
