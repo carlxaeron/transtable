@@ -131,7 +131,10 @@ class transtable{
 	
 	
 	/**
-	 * Returns an array with all folders (tabs) and corresponding translations
+	 * Returns an array with all folders (tabs) and corresponding translations.
+	 * 
+	 * @param string $for_folder path
+	 * @return array
 	 */
 	public function get_all_translations($for_folder = null){
 		
@@ -267,7 +270,7 @@ class transtable{
 	
 	
 	/**
-	 * Saves translation to file
+	 * Saves translation to file.
 	 * 
 	 * @param string $file_path_relative relative path from $TTCFG['php_array_files']['root_dir']
 	 * @param string $index text index
@@ -297,7 +300,7 @@ class transtable{
 	
 	
 	/**
-	 * Saves translation to file
+	 * Writes translation file to disk.
 	 *
 	 * @param string $file
 	 * @param string $translations
@@ -323,8 +326,7 @@ class transtable{
 	
 	
 	/**
-	 * Check if path is in subdirectory of $TTCFG['php_array_files']['root_dir']
-	 * and if exists.
+	 * Check if path is in subdirectory of the $TTCFG['php_array_files']['root_dir'] and if exists.
 	 * 
 	 * @param string $file_path_relative
 	 * @param bool $return_original_path
@@ -353,9 +355,9 @@ class transtable{
 	/**
 	 * Renames the index in the translation array
 	 * 
-	 * @param unknown_type $old_index
-	 * @param unknown_type $new_index
-	 * @param unknown_type $folder
+	 * @param string $old_index
+	 * @param string $new_index
+	 * @param string $folder
 	 */
 	public function rename_index($old_text_index, $new_text_index, $folder){
 	
@@ -394,12 +396,12 @@ class transtable{
 	
 	
 	/**
-	 * Deletes Index
+	 * Deletes index.
 	 * 
-	 * @param unknown_type $text_index
-	 * @param unknown_type $folder
+	 * @param string $text_index
+	 * @param string $folder
 	 * @throws transtable_exception
-	 * @return number
+	 * @return bool
 	 */
 	public function delete_index($text_index, $folder){
 		
@@ -439,23 +441,28 @@ class transtable{
 	
 	
 	/**
+	 * Checks if editing indexes is enabled.
+	 * 
+	 * @throws transtable_exception
 	 */
-	public function delete_translation($text_index, $folder, $file){
-	
-	}
-	
-	
 	protected function require_edit_index_permission(){
 	
 		if(!$this->config['enable_edit_index'])
 			throw new transtable_exception("Editing indexes not enabled.");
 	}
 	
+	
+	/**
+	 * Checks if deleting translations is enabled.
+	 * 
+	 * @throws transtable_exception
+	 */
 	protected function require_delete_translation_permission(){
 	
 		if(!$this->config['enable_delete_translation'])
 			throw new transtable_exception("Deleting translations is not enabled.");
 	}
+	
 	
 	/**
 	 * Changes a key in an array while maintaining the order if possible.
@@ -534,6 +541,10 @@ class transtable{
 		return $array;
 	}
 }
+
+
+
+
 
 
 /**
@@ -706,6 +717,10 @@ class transtable_exception extends Exception{}
 /**
  * Writes php code of translation files.
  * Used to write php translation files.
+ * 
+ * @param array $translations
+ * @param string $var_name
+ * @param string $arr_level
  */
 function transtable_echo_translation_array($translations, $var_name, $arr_level = ''){
 
@@ -724,7 +739,10 @@ function transtable_echo_translation_array($translations, $var_name, $arr_level 
 
 
 /**
- * Adds slashes
+ * Adds slashes.
+ * 
+ * @param string $translation
+ * @return string
  */
 function transtable_addslashes($translation){
 	return str_replace("'", '\\\'', $translation);
@@ -733,6 +751,9 @@ function transtable_addslashes($translation){
 
 /**
  * Removes extension from file name.
+ * 
+ * @param string $file_name
+ * @return string
  */
 function transtable_strip_extension($file_name){
 	return substr($file_name, 0, strrpos($file_name, '.'));
