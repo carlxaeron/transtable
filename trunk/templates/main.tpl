@@ -9,9 +9,12 @@
 <script type="text/javascript" src="js/functions.js"></script>
 <link rel="stylesheet" href="css/styles.css" type="text/css" />
 
-<?php foreach ($include_css_files as $css_file){ ?>
+<?php 
+if(isset($include_css_files) && is_array($include_css_files)){
+foreach ($include_css_files as $css_file){ 
+?>
 <link rel="stylesheet" href="<?php echo $css_file; ?>" type="text/css" />
-<?php } ?>
+<?php }} ?>
 
 </head>
 <body>
