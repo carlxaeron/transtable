@@ -22,7 +22,13 @@ transtable = {}
 /**
  * Temporary storage for original content while editing
  */
-transtable.cancel_content = {};
+//transtable.cancel_content = {}
+
+
+/**
+ * Last edited cell
+ */
+transtable.last_edit = null;
 
 
 /**
@@ -68,9 +74,22 @@ CKEDITOR.disableAutoInline = true;
  * Initialize translation table
  */
 transtable.init_table = function(){
+	
+	$('#transtable_folders, #transtable_sign').on('click', 'a', function (e){
+		if(transtable.last_edit)
+			transtable.save_translation(transtable.last_edit);
+	})
+
+	if($('#transtable_enable_html_editor').val() == 1){
+		$('#transtable_table').on('mouseover', '.transtable_edit_div', function(e){
+			transtable.init_html_editor($(e.currentTarget).attr('id'));
+		});
+	}
+	
 	$('#transtable_table').on('click', '.transtable_edit_div', function(e){
 		transtable.edit_translation($(e.currentTarget).attr('id'));
 	});
+
 	
 	if($('#transtable_enable_edit_index').val() == '1'){
 		$('#transtable_table').on('dblclick', '.transtable_index_cell', function(e){		
@@ -102,17 +121,20 @@ transtable.init_table = function(){
  */
 transtable.edit_translation = function(edit_div_id){
 	
-	transtable.cancel_content[edit_div_id] = $('#' + edit_div_id).html();
-	
-	// html editor
-	if($('#transtable_enable_html_editor').val() == 1){
-		if(!CKEDITOR.instances[edit_div_id])
-			CKEDITOR.inline(edit_div_id, transtable.CKeditor_config);
-	}
-	// txt editor
-	else{
-		// TODO
-	}
+	transtable.last_edit = edit_div_id;
+
+	//if($('#transtable_enable_html_editor').val() != 1){
+	//	transtable.cancel_content[edit_div_id] = $('#' + edit_div_id).html();	
+	//}
+}
+
+
+/**
+ * Inits html editor
+ */
+transtable.init_html_editor = function(edit_div_id){
+	if(!CKEDITOR.instances[edit_div_id])
+		CKEDITOR.inline(edit_div_id, transtable.CKeditor_config);
 }
 
 
@@ -120,9 +142,14 @@ transtable.edit_translation = function(edit_div_id){
  * Edits index
  */
 transtable.edit_index = function(td_element){
-	
+
 	var cell = $(td_element);
 	var translation_id = transtable.get_translation_id(td_element);
+	
+	// if already editing
+	if($('#transtable_index_input' + translation_id).length)
+		return;
+	
 	var old_index = $('#transtable_index' + translation_id).val();
 	var input_div = $('#transtable_index_div' + translation_id);
 	
@@ -203,9 +230,28 @@ transtable.save_translation = function(edit_div_id){
 		type: 'POST',
 		url: '?transtable_action=savetranslation',
 		data: {file_name:file_name, index:index, translation:translation, folder:$('#transtable_open_folder').val()},
-		//success: function(e){
-		//	transtable.cancel_edit_translation(translation_id, translation);
-		//}
+		success: function(reponse){
+			if(reponse == 1){
+				var file_name_no_ext = file_name.substr(0, file_name.lastIndexOf('.')) || file_name;
+				transtable.show_notice('Saved: ' + index + ' [' + file_name_no_ext + ']');				
+				transtable.last_edit = null;
+			}
+		}
+	});
+}
+
+
+/**
+ * Shows save indicator
+ */
+transtable.show_notice = function(message){
+	
+	var notice_div = $('<div class="transtable_notice">' + message + '</div>');
+	$("body").append(notice_div);
+	$(notice_div).fadeIn('slow', function() {
+		$(notice_div).fadeOut(900, function() {
+			$(notice_div).remove();
+		});
 	});
 }
 
@@ -215,18 +261,34 @@ transtable.save_translation = function(edit_div_id){
  */
 transtable.rename_index = function(translation_id){
 	
-	var old_index = $('#transtable_index' + translation_id).val();
-	var new_index = $('#transtable_index_input' + translation_id).val();
+	var old_index = $.trim($('#transtable_index' + translation_id).val());
+	var new_index = $.trim($('#transtable_index_input' + translation_id).val());
+	var index_unique = 1;
 	
 	if(old_index != new_index){
-		$.ajax({
-			type: 'POST',
-			url: '?transtable_action=saveindex',
-			data: {old_index:old_index, new_index:new_index, folder:$('#transtable_open_folder').val()},
-			success: function(e){
-				transtable.cancel_edit_index(translation_id, new_index);
+		
+		// check that new index is unique
+		$('[id^="transtable_index_div"]').each(function(){
+			if($.trim($(this).html()) == new_index){
+				index_unique = 0;
+				return false;
 			}
 		});
+		
+		if(index_unique){
+			$.ajax({
+				type: 'POST',
+				url: '?transtable_action=saveindex',
+				data: {old_index:old_index, new_index:new_index, folder:$('#transtable_open_folder').val()},
+				success: function(e){
+					transtable.cancel_edit_index(translation_id, new_index);
+				}
+			});
+		}
+		else{
+			alert("Translation with index '" + new_index + "' already exists");
+			return;
+		}
 	}
 	else
 		transtable.cancel_edit_index(translation_id);
