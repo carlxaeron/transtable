@@ -80,11 +80,10 @@ transtable.init_table = function(){
 			transtable.save_translation(transtable.last_edit);
 	})
 
-	if($('#transtable_enable_html_editor').val() == 1){
-		$('#transtable_table').on('mouseover', '.transtable_edit_div', function(e){
-			transtable.init_html_editor($(e.currentTarget).attr('id'));
-		});
-	}
+	$('#transtable_table').on('mouseover', '.transtable_edit_div', function(e){
+		//if($('#transtable_enable_html_editor').val() == 1)	
+		transtable.init_html_editor($(e.currentTarget).attr('id'));
+	});
 	
 	$('#transtable_table').on('click', '.transtable_edit_div', function(e){
 		transtable.edit_translation($(e.currentTarget).attr('id'));
