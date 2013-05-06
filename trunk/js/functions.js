@@ -40,6 +40,7 @@ transtable.CKeditor_config = {
 	toolbar : 'Transtable',
 	toolbar_Transtable :
 		[
+		 	['transtable_save'],
 			['Cut','Copy','Paste','PasteText','PasteFromWord'],
 			['Undo','Redo','-','SelectAll','RemoveFormat'],
 			['Link','Unlink'],
@@ -48,18 +49,22 @@ transtable.CKeditor_config = {
 			['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
 			['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
 			['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-			['Sourcedialog', 'SpecialChar']
+			['Sourcedialog', 'SpecialChar', 'transtable_cleanhtml']
 		],
 	enterMode : CKEDITOR.ENTER_BR,
 	shiftEnterMode: CKEDITOR.ENTER_P,
 	disableAutoInline: true,
 	format_tags : 'h1;h2;h3;h4',
 	on: {
-		blur: function(event) {
+		blur: function(event){
 			transtable.save_translation($(event.editor.element.$).attr('id'));
+	        },
+	        
+	        paste: function(event){
+	        	event.data.dataValue = transtable.strip_tags(event.data.dataValue);
 	        }
 	},
-	extraPlugins: 'sourcedialog',
+	extraPlugins: 'sourcedialog,transtable_cleanhtml,transtable_save',
 	removePlugins: 'sourcearea'
 };
 
@@ -433,6 +438,21 @@ transtable.show_hide_load = function(){
 				transtable.show_hide_column(chkbox.attr('data-transtable-column-index'), 0);
 			}
 		}
+	});
+}
+
+
+/**
+ * From: http://phpjs.org/functions/strip_tags
+ */
+transtable.strip_tags = function(input) {
+	
+	allowed = ['<blockquote>', '<p>', '<br>', '<strong>', '<em>', '<h1>', '<h2>', '<h3>', '<h4>', '<h5>', '<h6>', '<ol>', '<ul>', '<li>', '<img>', '<a>', '<i>', '<b>']
+	
+	var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi,
+	commentsAndPhpTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi;
+	return input.replace(commentsAndPhpTags, '').replace(tags, function ($0, $1) {
+		return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
 	});
 }
 

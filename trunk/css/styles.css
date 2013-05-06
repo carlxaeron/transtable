@@ -18,12 +18,6 @@ a:visited{
 	text-decoration:none;
 }
 
-/*
-#transtable_table td{
-	height: 50px;
-}
-*/
-
 .transtable_hidden {
 	display: none;
 }
@@ -240,3 +234,10 @@ from: http://webdesignerwall.com/tutorials/css3-gradient-buttons */
 	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0078a5', endColorstr='#00adee');
 }
 
+.cke_button__transtable_cleanhtml_icon{
+	background: url(clean_icon.png) no-repeat 0 0px !important;
+}
+
+.cke_button__transtable_save_icon{
+	background: url(save_icon.png) no-repeat 0 0px !important;
+}
