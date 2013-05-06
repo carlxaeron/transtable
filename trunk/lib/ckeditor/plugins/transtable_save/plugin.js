@@ -5,8 +5,6 @@
 
 		editor.addCommand( pluginName,{
 			exec : function( editor ){
-				
-				console.log(editor);
 				transtable.save_translation(editor.name);
 			},
 		
