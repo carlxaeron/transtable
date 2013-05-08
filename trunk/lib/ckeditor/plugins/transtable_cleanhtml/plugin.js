@@ -16,7 +16,7 @@
 
 		if ( editor.ui.addButton ) {
 			editor.ui.addButton('transtable_cleanhtml', {
-				label: 'Clean HTML',
+				label: 'Clean up HTML (leave only basic tags)',
 				command: pluginName
 			});
 		}
