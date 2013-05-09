@@ -14,22 +14,30 @@
  */
 
 
-include 'config.php';
+define('TRANSTABLE_BASE_DIR', dirname(__FILE__));
 
 
-/**
- * Find the action to do from the GET parameter.
- */
+// include config file
+include TRANSTABLE_BASE_DIR . '/config.php';
+// include configuration file that will override settings from config.php
+$config_override_path = TRANSTABLE_BASE_DIR . '/config_override.php';
+if(file_exists($config_override_path))
+	include_once $config_override_path;
+
+
+// find the action to do from the GET parameter
 if(isset($_GET['transtable_action']) && $_GET['transtable_action'])
 	$action = $_GET['transtable_action'];
 else
 	$action = 'index';
 
 
-/**
- * Controller part
- */
+
+//
+// Controller part
+//
 try{
+	
 	// main page
 	if($action == 'index'){
 		
@@ -44,14 +52,14 @@ try{
 		$translations = $transtable->get_all_translations($folder);
 		
 		// template engine object
-		$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
+		$dully = new Psa_Dully(TRANSTABLE_BASE_DIR . '/templates');
 		
 		if($translations){
 			$dully->assign('translate', $transtable);
 			$dully->assign('data', $translations);
 			$dully->assign('folder', $folder);
 			$dully->assign('page_title', $TTCFG['php_array_files']['page_title']);
-			$dully->assign('enable_html_editor', $TTCFG['php_array_files']['enable_html_editor']);
+			// $dully->assign('enable_html_editor', $TTCFG['php_array_files']['enable_html_editor']);
 			$dully->assign('enable_edit_index', $TTCFG['php_array_files']['enable_edit_index']);
 			$dully->assign('enable_delete_translation', $TTCFG['php_array_files']['enable_delete_translation']);
 			$dully->assign('enable_add_translation', $TTCFG['php_array_files']['enable_add_translation']);
@@ -90,14 +98,16 @@ catch(Exception $e){
 	
 	// send 500 header
 	if(!headers_sent())
-		header('HTTP/1.1 500 Exception');
+		header('HTTP/1.1 520 Exception');
 	
 	echo $e->getMessage();
 }
 
 
 
-
+//
+// Classes and functions:
+//
 
 
 /**
@@ -125,7 +135,7 @@ class transtable{
 			$this->config = $TTCFG['php_array_files'];
 		}
 
-		$this->config['root_dir'] = realpath($this->config['root_dir']);
+		$this->config['translations_root'] = realpath($this->config['translations_root']);
 	}
 	
 	
@@ -146,9 +156,9 @@ class transtable{
 		if($for_folder)
 			$for_folder = $this->check_path($for_folder);
 		
-		$root_path_len = strlen($this->config['root_dir']);
+		$root_path_len = strlen($this->config['translations_root']);
 		
-		$di = new RecursiveDirectoryIterator($this->config['root_dir']);
+		$di = new RecursiveDirectoryIterator($this->config['translations_root']);
 		foreach (new RecursiveIteratorIterator($di) as $path => $file) {
 			
 			// file name
@@ -271,10 +281,11 @@ class transtable{
 	/**
 	 * Saves translation to file.
 	 * 
-	 * @param string $file_path_relative relative path from $TTCFG['php_array_files']['root_dir']
-	 * @param string $index text index
-	 * @param string $translation translation value
-	 * @throws transtable_exception
+	 * @param string $file_name
+	 * @param string $folder
+	 * @param string $index
+	 * @param string $translation
+	 * @return int
 	 */
 	public function save_translation($file_name, $folder, $index, $translation){
 	
@@ -300,14 +311,14 @@ class transtable{
 	
 	/**
 	 * Writes translation file to disk.
-	 *
+	 * 
 	 * @param string $file
 	 * @param string $translations
 	 * @throws transtable_exception
 	 */
 	protected function write_translation_file($file, $translations){
 		
-		$dully = new Psa_Dully(dirname(__FILE__) . '/templates');
+		$dully = new Psa_Dully(TRANSTABLE_BASE_DIR . '/templates');
 		$dully->assign('t', $translations);
 		$dully->assign('var_name', $this->config['var_name']);
 		
@@ -325,7 +336,7 @@ class transtable{
 	
 	
 	/**
-	 * Check if path is in subdirectory of the $TTCFG['php_array_files']['root_dir'] and if exists.
+	 * Check if path is in subdirectory of the $TTCFG['php_array_files']['translations_root'] and if exists.
 	 * 
 	 * @param string $file_path_relative
 	 * @param bool $return_original_path
@@ -335,14 +346,14 @@ class transtable{
 	protected function check_path($file_path_relative, $return_absolute_path = 0){
 		
 		// full path to file
-		$file_path_clean = realpath($this->config['root_dir'] . '/' . $file_path_relative);
+		$file_path_clean = realpath($this->config['translations_root'] . '/' . $file_path_relative);
 	
 		if(!$file_path_clean)
-			throw new transtable_exception("File {$this->config['root_dir']}/$file_path_relative doesn't exists");
+			throw new transtable_exception("File {$this->config['translations_root']}/$file_path_relative doesn't exists");
 	
 		// check if file is subdir
-		if(strcmp(substr($file_path_clean, 0, strlen($this->config['root_dir'])), $this->config['root_dir']) !== 0)
-			throw new transtable_exception("File $file_path_clean is not in subdirecory of {$this->config['root_dir']}");
+		if(strcmp(substr($file_path_clean, 0, strlen($this->config['translations_root'])), $this->config['translations_root']) !== 0)
+			throw new transtable_exception("File $file_path_clean is not in subdirecory of {$this->config['translations_root']}");
 		
 		if($return_absolute_path)
 			return $file_path_clean;
@@ -476,11 +487,8 @@ class transtable{
 		// if indexes are same
 		if($old_text_index == $new_text_index)
 			return $array;
-		
-		// if new index is subindex
-		//if()
 			
-		// if new index already exists
+		// TODO: if new index already exists
 		
 		
 		// if old key is array
@@ -542,88 +550,8 @@ class transtable{
 }
 
 
-
-
-
-
 /**
  * Simple template engine class.
- * I called this class Dully to be opposite to {@link http://www.smarty.net Smarty}.
- * I needed some simple name and something like '<i>simple_template</i>' seemed too long.
- * It has few methods that are similar to those in Smarty template engine.
- *
- * All that Dully does is to put values from associative array into local namespace and
- * includes .php (template) file. There are no special template tags, just use PHP code
- * blocks to echo values. Templates are ordinary PHP files and you can write them
- * as any other .php script, but keep in mind that the point of template engine
- * should be to separate business logic from presentation.
- * So you should not put any logic (calculations, getting data from a database ...)
- * into templates. With {@link http://www.smarty.net Smarty} that is easier to achieve
- * and it has many advanced features so I suggest that you use Smarty as template engine.
- * But if you know what you are doing or need simple and fast template
- * engine or don't want to learn Smarty's tags you can use Dully.
- * Dully class doesn't include anything from PSA so you can use it as template engine in any PHP application.
- *
- * This class is inspired from {@link http://www.massassi.com/php/articles/template_engines/} and there are
- * some interesting thoughts about template engines.
- *
- * <b>Examples</b>
- *
- * <b>1)</b> Simple example with one template file:
- *
- * Template file <samp>template.tpl</samp>:
- * {@example documentation_examples/templates/template.tpl}
- *
- * .php file:
- * {@example documentation_examples/dully1.php}
- *
- * The printout of the above .php script will be:
- * <pre>
- * This is text from template file template.php
- * My car is Black.
- * Something else: bla bla bla
- * </pre>
- *
- * <b>Note:</b> you can write <kbd><?= $some_name ?></kbd> instead of <kbd><?php echo $some_name ?></kbd>.
- * Use of this shortcut requires <var>short_open_tag</var> PHP ini option to be on.
- *
- * <b>2)</b> You can put one rendered template into another:
- *
- * template file <samp>template1.tpl</samp>:
- * {@example documentation_examples/templates/template1.tpl}
- *
- * template file <samp>template2.tpl</samp>:
- * {@example documentation_examples/templates/template2.tpl}
- *
- * .php file:
- * {@example documentation_examples/dully2.php}
- *
- * The above example will output:
- * <pre>
- * This is text from template1.php
- * This is text from template2.php
- * bla bla bla
- * </pre>
- *
- * <b>3)</b> In this kind of templates it's nice to use alternative PHP syntax for control structures.
- * See details in PHP {@link http://www.php.net/manual/en/control-structures.alternative-syntax.php manual}.
- * <code>
- * <? if ($variable = 'abcd'): ?>
- * 	<h1>this is something</h1>
- * 	<p>
- * 		bla bla
- * 	</p>
- * <? endif ?>
- *
- * <? foreach ($array as $value): ?>
- * 	<div><?= $value['email']) ?></div>
- * 	<div><?= $value['phone_number']) ?></div>
- * <? endforeach ?>
- * </code>
- *
- *
- * @see Psa_Dully_View
- * @see Psa_Smarty
  */
 class Psa_Dully{
 
@@ -658,7 +586,6 @@ class Psa_Dully{
 
 	/**
 	 * Assigns values to the templates.
-	 * See examples in {@link Psa_Dully} class description.
 	 *
 	 * @param string $name variable name in template
 	 * @param mixed $value variable value in template
@@ -672,7 +599,6 @@ class Psa_Dully{
 
 	/**
 	 * Returns the fetched template as string.
-	 * See examples in {@link Psa_Dully} class description.
 	 *
 	 * @param string $template_filE template file name (path)
 	 * @return string fetched (rendered) template
@@ -696,7 +622,6 @@ class Psa_Dully{
 
 	/**
 	 * Outputs the fetched template.
-	 * See examples in {@link Psa_Dully} class description.
 	 *
 	 * @param string $template_file template file name (path)
 	 * @see fetch()
