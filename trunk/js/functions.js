@@ -4,9 +4,13 @@ $(document).ready(function () {
 	
 	transtable.show_hide_load();
 	
-	$('body').ajaxError(function(event, request, settings){
-		if(request.responseText)
+	$(document).ajaxError(function(event, request, settings){
+		console.log('aaa');
+		console.log(request.error().status);
+	
+		if(request.error().status == '520' || request.responseText){
 			alert(request.responseText);
+		}
 		else
 			alert("Error requesting page: " + settings.url);
 	})
