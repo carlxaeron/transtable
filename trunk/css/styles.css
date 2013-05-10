@@ -243,5 +243,5 @@ from: http://webdesignerwall.com/tutorials/css3-gradient-buttons */
 }
 
 .cke_inner{
-	white-space: nowrap !important;
+	min-width: 460px !important;
 }
