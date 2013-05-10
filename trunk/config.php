@@ -3,8 +3,9 @@
  * Configuration.
  */
 
+
 // Absolute filesystem path to folder with translation files (you can organize files in subfolders)
-$TTCFG['php_array_files']['translations_root'] = '/somefolder/translations'; // without / at the end
+$TTCFG['php_array_files']['translations_root'] = '/my_translations'; // without / at the end
 
 // Translation file name pattern. Transtable will search for files matcing this pattern.
 $TTCFG['php_array_files']['file_name_pattern'] = '..\.php';
@@ -18,7 +19,7 @@ $TTCFG['php_array_files']['page_title'] = 'Transtable';
 // Enable editing indexes (first column)
 $TTCFG['php_array_files']['enable_edit_index'] = 1;
 
-// Delimiter for translations in multi dimensional arrays
+// Delimiter in translation index for multi dimensional arrays
 $TTCFG['php_array_files']['array_delimiter'] = '|';
 
 // Enable deleting translations
