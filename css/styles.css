@@ -2,9 +2,9 @@ body{
 	background-color: #666;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 10pt;
-	margin: 5px;
 	position: relative;
 	display: inline-block;
+	width: auto;
 }
 
 a{
@@ -240,4 +240,8 @@ from: http://webdesignerwall.com/tutorials/css3-gradient-buttons */
 
 .cke_button__transtable_save_icon{
 	background: url(save_icon.png) no-repeat 0 0px !important;
+}
+
+.cke_inner{
+	white-space: nowrap !important;
 }

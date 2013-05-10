@@ -427,13 +427,13 @@ class transtable{
 		$translations = $this->get_all_translations($folder);
 		
 		// for each translation file in folder
-		foreach ($translations as $folder => $data) {
+		foreach ($translations as $folderK => $data) {
 				
-			if($folder == $folder){
+			if($folderK == $folder){
 				foreach ($data['translations'] as $file_name => $translations) {
 		
 					// full path to file with translations
-					$file_path = $this->check_path($folder . $file_name, 'return_absolute_path');
+					$file_path = $this->check_path($folder . '/' . $file_name, 'return_absolute_path');
 						
 					// delete index
 					eval('unset($translations' . $this->get_php_index($text_index) . ');');
