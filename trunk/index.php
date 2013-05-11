@@ -152,7 +152,7 @@ class transtable{
 		// file name pattern
 		$file_name_pattern = '/^' . $this->config['file_name_pattern'] . '$/';
 		
-		// include foles from this folder
+		// include files from this folder
 		if($for_folder)
 			$for_folder = $this->check_path($for_folder);
 		
@@ -207,7 +207,7 @@ class transtable{
 					
 					// for each file
 					foreach ($return[$folder]['translations'] as $file_name => $translations) {
-						// for each translation in file
+						// for each translation in the file
 						foreach ($translations as $index => $translation) {
 							
 							if(is_array($translation)){
@@ -353,7 +353,7 @@ class transtable{
 		if(!$file_path_clean)
 			throw new transtable_exception("File {$this->config['translations_root']}/$file_path_relative doesn't exists");
 	
-		// check if file is subdir
+		// check if file is subdirectory of $TTCFG['php_array_files']['translations_root']
 		if(strcmp(substr($file_path_clean, 0, strlen($this->config['translations_root'])), $this->config['translations_root']) !== 0)
 			throw new transtable_exception("File $file_path_clean is not in subdirecory of {$this->config['translations_root']}");
 		
@@ -635,7 +635,7 @@ class Psa_Dully{
 
 
 /**
- * Exception transtable_exception
+ * Transtable exception class
  */
 class transtable_exception extends Exception{}
 

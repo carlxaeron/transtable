@@ -9,6 +9,7 @@ body{
 	margin: 0px;
 	padding: 0px;
 }
+
 #transtable_inbody{
 	padding-top: 10px;
 	padding-right: 5px;
@@ -23,6 +24,7 @@ a{
 a:hover{
 	text-decoration:underline;
 }
+
 a:visited{
 	text-decoration:none;
 }
@@ -96,8 +98,7 @@ a:visited{
 }
 
 
-/* button 
-from: http://webdesignerwall.com/tutorials/css3-gradient-buttons */
+/* buttons from: http://webdesignerwall.com/tutorials/css3-gradient-buttons */
 .transtable_btt {
 	display: inline-block;
 	zoom: 1; /* zoom and *display = ie7 hack for display:inline-block */
