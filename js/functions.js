@@ -16,15 +16,9 @@ $(document).ready(function () {
 
 
 /**
- * transtable object - namespace.
+ * transtable object - namespace
  */
 transtable = {}
-
-
-/**
- * Temporary storage for original content while editing
- */
-//transtable.cancel_content = {}
 
 
 /**
@@ -76,7 +70,7 @@ transtable.CKeditor_config = {
 
 
 /**
- * Do not auto initialize all html editors
+ * Do not auto initialize all HTML editors
  */
 CKEDITOR.disableAutoInline = true;
 
@@ -92,7 +86,7 @@ transtable.init_table = function(){
 	})
 
 	$('#transtable_table').on('mouseover', '.transtable_edit_div', function(e){
-		//if($('#transtable_enable_html_editor').val() == 1)	
+		//if($('#transtable_enable_html_editor').val() == 1)
 		transtable.init_html_editor($(e.currentTarget).attr('id'));
 	});
 	
@@ -140,7 +134,7 @@ transtable.edit_translation = function(edit_div_id){
 
 
 /**
- * Inits html editor
+ * Inits HTML editor
  */
 transtable.init_html_editor = function(edit_div_id){
 	if(!CKEDITOR.instances[edit_div_id])
@@ -195,7 +189,6 @@ transtable.cancel_edit_translation = function(translation_id, translation){
 	
 	$('#transtable_translation' + translation_id).html(transtable.cancel_content[translation_id]);
 	delete transtable.cancel_content[translation_id];
-	
 }
 */
 
