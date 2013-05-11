@@ -1,7 +1,7 @@
 You can checkout from SVN:
 
-https://transtable.googlecode.com/svn/trunk/
+http://transtable.googlecode.com/svn/trunk/
 
-or git:
+or GIT:
 
 https://github.com/bmauser/transtable.git
