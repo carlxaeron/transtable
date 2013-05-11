@@ -1,1 +1,5 @@
-aaaaaa
+You can checkout from SVN:
+https://github.com/bmauser/transtable.git
+
+or git:
+https://github.com/bmauser/transtable.git
