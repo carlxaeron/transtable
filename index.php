@@ -330,8 +330,10 @@ class transtable{
 		if($this->config['new_lines'] != "\n")
 			$file_content = str_replace("\n", $this->config['new_lines'], $file_content);
 		
-		if(!file_put_contents($file, $file_content))
-			throw new transtable_exception("Cannot write to file $file");
+		if(!isset($this->config['dont_write_file'])){
+			if(!file_put_contents($file, $file_content))
+				throw new transtable_exception("Cannot write to file $file");
+		}
 	}
 	
 	
