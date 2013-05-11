@@ -3,8 +3,17 @@ body{
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 10pt;
 	position: relative;
-	display: inline-block;
-	width: auto;
+	display: block;
+	width: 100%;
+	right: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+#transtable_inbody{
+	padding-top: 10px;
+	padding-right: 5px;
+	padding-bottom: 10px;
+	padding-left: 5px;
 }
 
 a{
@@ -81,8 +90,8 @@ a:visited{
 }
 
 .transtable_edit_div{
-	min-height: 50px;
-	min-width: 200px;
+	min-height: 40px;
+	min-width: 150px;
 	padding-top: 7px;
 }
 
@@ -147,10 +156,12 @@ from: http://webdesignerwall.com/tutorials/css3-gradient-buttons */
 }
 
 #transtable_sign {
-	float: right;
 	padding: 5px;
 	font-style: italic;
 	font-size: 8pt;
+	position: absolute;
+	right: 0;
+	z-index: -1;
 }
 
 #transtable_sign a{

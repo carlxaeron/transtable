@@ -9,8 +9,8 @@ $(document).ready(function () {
 		if(request.error().status == '520' || request.responseText){
 			alert(request.responseText);
 		}
-		else
-			alert("Error requesting page: " + settings.url);
+		//else
+		//	alert("Error requesting page: " + settings.url);
 	})
 });
 
@@ -64,7 +64,11 @@ transtable.CKeditor_config = {
 	        
 	        paste: function(event){
 	        	event.data.dataValue = transtable.strip_tags(event.data.dataValue);
-	        }
+	        },
+	        
+	        instanceReady: function(event){
+	        	$(event.editor.element.$).attr('title','');
+	        },
 	},
 	extraPlugins: 'sourcedialog,transtable_cleanhtml,transtable_save',
 	removePlugins: 'sourcearea'
