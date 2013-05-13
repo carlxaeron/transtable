@@ -1,4 +1,4 @@
-You can checkout from SVN:
+Checkout from SVN:
 
 http://transtable.googlecode.com/svn/trunk/
 
