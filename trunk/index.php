@@ -135,6 +135,8 @@ class transtable{
 			$this->config = $TTCFG['php_array_files'];
 		}
 
+		// replace <TRANSTABLE_ROOT> with TRANSTABLE_BASE_DIR
+		$this->config['translations_root'] = str_replace('<TRANSTABLE_ROOT>', TRANSTABLE_BASE_DIR, $this->config['translations_root']);
 		$this->config['translations_root'] = realpath($this->config['translations_root']);
 	}
 	
