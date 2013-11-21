@@ -329,7 +329,7 @@ class transtable{
 		$file_content = $dully->fetch('translation_file.tpl');
 		
 		// normalize new lines
-		str_replace(array("\r\n","\r"), "\n", $file_content);
+		$file_content = str_replace(array("\r\n","\r"), "\n", $file_content);
 		if($this->config['new_lines'] != "\n")
 			$file_content = str_replace("\n", $this->config['new_lines'], $file_content);
 		
